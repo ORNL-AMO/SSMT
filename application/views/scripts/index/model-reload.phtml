@@ -1,0 +1,48 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Equipment Calculators
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+echo $this->partial('index/partials/modelMenu.phtml', array('action' => 'reload'));
+?>
+             
+<h2><?php echo $this->translator->_('Reload Steam System Model');?></h2>
+<p><?php echo $this->translator->_('A previously downloaded steam model may be reloaded.');?></p>
+<p><?php echo $this->translator->_('There are 3 reload options');?>:</p>
+<ul>
+    <li><?php echo $this->translator->_('Base and Adjusted Model');?></li>
+    <li><?php echo $this->translator->_('Base Model Only');?></li>
+    <li><?php echo $this->translator->_('Load Adjusted Model as Base Model');?></li>
+</ul>
+
+<form method="POST">
+    <table class="data">
+        <tr>
+            <th style="width: 200px;"><?php echo $this->translator->_('Select Reload Type');?>:</th>
+            <td>
+                <select name="reloadType">
+                    <option value="full"><?php echo $this->translator->_('Base and Adjusted Model');?></option>
+                    <option value="base"><?php echo $this->translator->_('Base Model Only');?></option>
+                    <option value="switch"><?php echo $this->translator->_('Load Adjusted as Base');?></option>
+                </select>    
+            </td>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_("Copy the ENTIRE 'Upload Data' spreadsheet and paste it here");?>:</th>
+            <td style="vertical-align: middle;">
+                <textarea name="uploadModel" style="width: 200px; height: 50px; margin: 0px;"></textarea>    
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td style="text-align: center;"><input type="submit" name="reload" value='<?php echo $this->translator->_('Reload Model');?>'></td>
+        </tr>
+    </table>
+</form>

@@ -1,0 +1,452 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Steam Model
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+global $CURRENCY_SYMBOL; 
+$mS = new Steam_MeasurementSystem();
+$modelForm = new Steam_Model_BaseForm();
+$steamModelCommunicator = new Steam_Model_Communicator();
+?>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        hideHeaders();
+        $('#headerCount').change(function() {
+            hideHeaders();
+        });
+        
+        function hideHeaders(){
+            if ($('#headerCount').val()==1){
+                $('.lpHeaderColumn').hide();
+                $('.mpHeaderColumn').hide();
+                $('#flashCondRow').hide(); 
+                $('#turbineHpLpTable').hide();
+                $('#turbineHpMpTable').hide();
+                $('#turbineMpLpTable').hide();
+            }
+            if ($('#headerCount').val()==2){
+                $('.lpHeaderColumn').show();
+                $('.mpHeaderColumn').hide();
+                $('#flashCondRow').show();      
+                $('#turbineHpLpTable').show();
+                $('#turbineHpMpTable').hide();
+                $('#turbineMpLpTable').hide();
+            }
+            if ($('#headerCount').val()==3){
+                $('.lpHeaderColumn').show();
+                $('.mpHeaderColumn').show();
+                $('#flashCondRow').show();      
+                $('#turbineHpLpTable').show();
+                $('#turbineHpMpTable').show();
+                $('#turbineMpLpTable').show();
+            }  
+        }
+           
+        <?php
+        foreach(Steam_Support::steamTurbineCodes() as $turbineName){    ?>          
+            processTurbine<?php echo $turbineName; ?>();
+            $('#turbine<?php echo $turbineName; ?>Method').change(function(){ processTurbine<?php echo $turbineName; ?>(); });
+            function processTurbine<?php echo $turbineName; ?>(){
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'balanceHeader'){
+                    $("#<?php echo $turbineName; ?>FixedFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>FixedPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MinFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MinPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxPowerRow").hide();
+                };
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'fixedFlow'){        
+                    $("#<?php echo $turbineName; ?>FixedFlowRow").fadeIn('fast');
+                    $("#<?php echo $turbineName; ?>FixedPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MinFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MinPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxPowerRow").hide();
+                };
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'flowRange'){        
+                    $("#<?php echo $turbineName; ?>FixedFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>FixedPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MinFlowRow").fadeIn('fast');
+                    $("#<?php echo $turbineName; ?>MaxFlowRow").fadeIn('fast');
+                    $("#<?php echo $turbineName; ?>MinPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxPowerRow").hide();
+                };
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'fixedPower'){   
+                    $("#<?php echo $turbineName; ?>FixedFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>FixedPowerRow").fadeIn('fast');
+                    $("#<?php echo $turbineName; ?>MinFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MinPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxPowerRow").hide();
+                };
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'powerRange'){
+                    $("#<?php echo $turbineName; ?>FixedFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>FixedPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MinFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MinPowerRow").fadeIn('fast');
+                    $("#<?php echo $turbineName; ?>MaxPowerRow").fadeIn('fast');
+                };
+            }
+
+            toggleTurbine<?php echo $turbineName; ?>();
+            $('#turbine<?php echo $turbineName; ?>On').change(function(){ toggleTurbine<?php echo $turbineName; ?>() });
+            function toggleTurbine<?php echo $turbineName; ?>(){
+                if ($('#turbine<?php echo $turbineName; ?>On:checked').val() == '1'){
+                    $("#<?php echo $turbineName; ?>tMethodRow").show();
+                    $("#<?php echo $turbineName; ?>IsoEffRow").show();
+                    $("#<?php echo $turbineName; ?>GenEffRow").show();
+                    <?php if ($turbineName=='Cond') echo "$(\"#{$turbineName}OutletPressureRow\").show();"?>
+                    processTurbine<?php echo $turbineName; ?>();
+                }else{
+                    $("#<?php echo $turbineName; ?>tMethodRow").hide();
+                    $("#<?php echo $turbineName; ?>IsoEffRow").hide();                    
+                    $("#<?php echo $turbineName; ?>GenEffRow").hide();
+                    <?php if ($turbineName=='Cond') echo "$(\"#{$turbineName}OutletPressureRow\").hide();"?>
+                    $("#<?php echo $turbineName; ?>FixedFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>FixedPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MinFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxFlowRow").hide();
+                    $("#<?php echo $turbineName; ?>MinPowerRow").hide();
+                    $("#<?php echo $turbineName; ?>MaxPowerRow").hide();
+                }
+            };
+            toggleApproachTemp();
+            
+            $('#blowdownHeatX').change(function(){ toggleApproachTemp(); });
+            function toggleApproachTemp(){
+                if ($('#blowdownHeatX').val() == 'No'){ 
+                    $("#blowdownHeatXTempColumn").hide();
+                }else{
+                    $("#blowdownHeatXTempColumn").show();
+                }
+            }   
+            
+    <?php }
+    echo $this->partial('/index/partials/modelHintJS.phtml'); 
+    echo $modelForm->jqueryAdd();
+    ?>
+            
+    });
+</script>
+
+<?php
+if (isset($_POST['Enter'])){
+    if ($modelForm->isValid($_POST)){
+        $baseDTO = new Steam_DTO('baseModel', $modelForm->getValues());
+        $steamModelCommunicator->loadBaseModel($baseDTO );
+        $steamModel = $steamModelCommunicator->baseModel;   
+    }else{
+        $steamModelCommunicator->setStatus('Base Model NOT Generated: See Errors Below', true);
+    }
+}else{
+    if ($steamModelCommunicator->baseLoaded) $modelForm->isValid($steamModelCommunicator->baseDTO->unload());
+}
+echo $this->partial('index/partials/modelMenu.phtml', array('action' => 'baseModel'));
+echo $steamModelCommunicator->status();
+?>
+<?php echo $this->partial('/index/partials/dataFieldHint.phtml'); ?>
+
+<form method="POST" action="baseModel">    
+    <h2><?php echo $this->translator->_('Boiler Details');?></h2>    
+    <table class="data" id="boilerDetailTable">
+        <tr>
+            <th><?php echo $this->translator->_('Boiler Combustion Efficiency');?>*</th>
+            <td><?php echo $modelForm->boilerEff->renderViewHelper().' '.$mS->label('%');?></td>
+                <?php if ($errors = $modelForm->boilerEff->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Fuel Type');?>*</th>
+            <td><?php echo $modelForm->fuelType->renderViewHelper();?></td>
+                <?php if ($errors = $modelForm->fuelType->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Blowdown Rate');?>*</th>
+            <td><?php echo $modelForm->blowdownRate->renderViewHelper().' '.$mS->label('%');?></td>
+                <?php if ($errors = $modelForm->blowdownRate->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Is the blowdown flashed?');?>*</th>
+            <td><?php echo $modelForm->blowdownFlashLP->renderViewHelper();?></td>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Preheat Make-Up Water with Blowdown');?>*</th>
+            <td><?php echo $modelForm->blowdownHeatX->renderViewHelper();?></td>
+                <?php if ($errors = $modelForm->blowdownHeatX->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr id="blowdownHeatXTempColumn">
+            <th>-<?php echo $this->translator->_('Approach Temperature');?>*</th>
+            <td><?php echo $modelForm->blowdownHeatXTemp->renderViewHelper().' '.$mS->label('temperature');?></td>
+                <?php if ($errors = $modelForm->blowdownHeatXTemp->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Steam Temperature');?>*</th>
+            <td><?php echo $modelForm->boilerTemp->renderViewHelper().' '.$mS->label('temperature');?></td>
+                <?php if ($errors = $modelForm->boilerTemp->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Deaerator Vent Rate');?>*</th>
+            <td><?php echo $modelForm->daVentRate->renderViewHelper().' '.$mS->label('%');?></td>
+                <?php if ($errors = $modelForm->daVentRate->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Deaerator Pressure');?>*</th>
+            <td><?php echo $modelForm->daPressure->renderViewHelper().' '.$mS->label('pressure');?></td>
+                <?php if ($errors = $modelForm->daPressure->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+    </table>
+    
+    <h2><?php echo $this->translator->_('General Details');?></h2>    
+    <table class="data">
+        <tr>
+            <th><?php echo $this->translator->_('Site Power Import');?>*</th>
+            <td><?php echo $modelForm->sitePowerImport->renderViewHelper().' '.$mS->label('power');?></td>
+                <?php if ($errors = $modelForm->sitePowerImport->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Electricity Unit Cost');?>*</th>
+            <td><?php echo $modelForm->sitePowerCost->renderViewHelper().' '.$CURRENCY_SYMBOL.' / '.$mS->label('electricity');?></td>
+                <?php if ($errors = $modelForm->sitePowerCost->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Yearly Operating Hours');?>*</th>
+            <td><?php echo $modelForm->operatingHours->renderViewHelper().' '.$mS->label('hrs');?></td>
+                <?php if ($errors = $modelForm->operatingHours->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Make-Up Water Unit Cost');?>*</th>
+            <td><?php echo $modelForm->makeupWaterCost->renderViewHelper().' '.$CURRENCY_SYMBOL.' / '.$mS->label('volume');?></td>
+                <?php if ($errors = $modelForm->makeupWaterCost->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Make-Up Water Temperature');?>*</th>
+            <td><?php echo $modelForm->makeupWaterTemp->renderViewHelper().' '.$mS->label('temperature');?></td>
+                <?php if ($errors = $modelForm->makeupWaterTemp->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr>
+            <th><?php echo $this->translator->_('Fuel Unit Cost');?>*</th>
+            <td><?php echo $modelForm->fuelUnitCost->renderViewHelper().' '.$CURRENCY_SYMBOL.' / '.$mS->label('energy');?></td>
+                <?php if ($errors = $modelForm->fuelUnitCost->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+    </table>    
+        
+    <h2><?php echo $this->translator->_('Header Details');?></h2>
+    <table class="data">
+        <tr>
+            <th><?php echo $this->translator->_('Number of Headers');?></th>
+            <td><?php echo $modelForm->headerCount->renderViewHelper();?></td>
+        </tr>
+    </table>
+    <table class="data">
+        <thead>
+        <tr>
+            <th><?php echo $this->translator->_('HEADERS');?></th>
+            <th><?php echo $this->translator->_('HP');?></th>
+            <th class="mpHeaderColumn"><?php echo $this->translator->_('MP');?></th>
+            <th class="lpHeaderColumn"><?php echo $this->translator->_('LP');?></th>
+            <td></td>
+        </tr>
+        </thead>
+        <tr>
+            <th style="vertical-align: middle;"><?php echo $this->translator->_('Pressure');?>*</th>
+            <td style="vertical-align: middle;"><?php echo $modelForm->highPressure->renderViewHelper();?></td>
+            <td class="mpHeaderColumn" style="vertical-align: middle;"><?php echo $modelForm->mediumPressure->renderViewHelper();?></td>
+            <td class="lpHeaderColumn" style="vertical-align: middle;"><?php echo $modelForm->lowPressure->renderViewHelper();?></td>
+            <td style="vertical-align: middle;"><?php echo $mS->label('pressure');?></td>
+                <?php 
+                $hpErrors = $modelForm->highPressure->renderErrors();
+                $mpErrors = $modelForm->mediumPressure->renderErrors();
+                $lpErrors = $modelForm->lowPressure->renderErrors();
+                if ($hpErrors or $mpErrors or $lpErrors){
+                    echo "<td>";
+                    if ($hpErrors) echo "<h3>".$this->translator->_('High Pressure').":</h3> {$hpErrors}"; 
+                    if ($mpErrors) echo "<h3>".$this->translator->_('Medium Pressure').":</h3> {$mpErrors}"; 
+                    if ($lpErrors) echo "<h3>".$this->translator->_('Low Pressure').":</h3> {$lpErrors}"; 
+                    echo "</td>";
+                }?>
+        </tr>
+        <tr>
+            <th style="vertical-align: middle;"><?php echo $this->translator->_('Process Steam Usage');?>*</th>
+            <td style="vertical-align: middle;"><?php echo $modelForm->hpSteamUsage->renderViewHelper();?></td>
+            <td class="mpHeaderColumn" style="vertical-align: middle;"><?php echo $modelForm->mpSteamUsage->renderViewHelper();?></td>
+            <td class="lpHeaderColumn" style="vertical-align: middle;"><?php echo $modelForm->lpSteamUsage->renderViewHelper();?></td>
+            <td style="vertical-align: middle;"><?php echo $mS->label('massflow');?></td>
+                <?php 
+                $hpErrors = $modelForm->hpSteamUsage->renderErrors();
+                $mpErrors = $modelForm->mpSteamUsage->renderErrors();
+                $lpErrors = $modelForm->lpSteamUsage->renderErrors();
+                if ($hpErrors or $mpErrors or $lpErrors){
+                echo "<td>";
+                    if ($hpErrors) echo "<h3>".$this->translator->_('High Pressure').":</h3> {$hpErrors}"; 
+                    if ($mpErrors) echo "<h3>".$this->translator->_('Medium Pressure').":</h3> {$mpErrors}"; 
+                    if ($lpErrors) echo "<h3>".$this->translator->_('Low Pressure').":</h3> {$lpErrors}"; 
+                echo "</td>";
+                }?>
+        </tr>
+        <tr>
+            <th style="vertical-align: middle;"><?php echo $this->translator->_('Condensate Recovery');?>*</th>
+            <td style="vertical-align: middle;"><?php echo $modelForm->hpCondReturnRate->renderViewHelper();?></td>
+            <td class="mpHeaderColumn" style="vertical-align: middle;"><?php echo $modelForm->mpCondReturnRate->renderViewHelper();?></td>
+            <td class="lpHeaderColumn" style="vertical-align: middle;"><?php echo $modelForm->lpCondReturnRate->renderViewHelper();?></td>
+            <td style="vertical-align: middle;"><?php echo $mS->label('%');?></td>
+                <?php 
+                $hpErrors = $modelForm->hpCondReturnRate->renderErrors();
+                $mpErrors = $modelForm->mpCondReturnRate->renderErrors();
+                $lpErrors = $modelForm->lpCondReturnRate->renderErrors();
+                if ($hpErrors or $mpErrors or $lpErrors){
+                echo "<td>";
+                    if ($hpErrors) echo "<h3>".$this->translator->_('High Pressure').":</h3> {$hpErrors}"; 
+                    if ($mpErrors) echo "<h3>".$this->translator->_('Medium Pressure').":</h3> {$mpErrors}"; 
+                    if ($lpErrors) echo "<h3>".$this->translator->_('Low Pressure').":</h3> {$lpErrors}"; 
+                echo "</td>";
+                }?>
+        </tr>
+        <tr id="flashCondRow">
+            <th><?php echo $this->translator->_('Flash Condensate into Header');?></th>
+            <td></td>
+            <td class="mpHeaderColumn"><?php echo $modelForm->hpCondFlash->renderViewHelper();?></td>
+            <td class="lpHeaderColumn"><?php echo $modelForm->mpCondFlash->renderViewHelper();?></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th style="vertical-align: middle;"><?php echo $this->translator->_('Condensate Return Temperature');?>*</th>
+            <td style="vertical-align: middle;"><?php echo $modelForm->condReturnTemp->renderViewHelper();?></td>
+            <td colspan="3" style="vertical-align: middle;"><?php echo $mS->label('temperature');?>
+                <?php if ($errors = $modelForm->condReturnTemp->renderErrors()) echo $errors; ?></td>
+        </tr>
+        <tr>
+            <th style="vertical-align: middle;"><?php echo $this->translator->_('Flash Condensate Return');?>*</th>
+            <td style="vertical-align: middle;"><?php echo $modelForm->condReturnFlash->renderViewHelper();?></td>
+            <td colspan="3" style="vertical-align: middle;">
+                <?php if ($errors = $modelForm->condReturnFlash->renderErrors()) echo $errors; ?></td>
+        </tr>
+
+        <tr id="heatLossPercentRow">
+            <th style="vertical-align: middle;"><?php echo $this->translator->_('Heat Loss');?>*</th>
+            <td style="vertical-align: middle;"><?php echo $modelForm->hpHeatLossPercent->renderViewHelper();?></td>
+            <td class="mpHeaderColumn" style="vertical-align: middle;"><?php echo $modelForm->mpHeatLossPercent->renderViewHelper();?></td>
+            <td class="lpHeaderColumn" style="vertical-align: middle;"><?php echo $modelForm->lpHeatLossPercent->renderViewHelper();?></td>
+            <td style="vertical-align: middle;"><?php echo $mS->label('%');?></td>
+                <?php 
+                $hpErrors = $modelForm->hpHeatLossPercent->renderErrors();
+                $mpErrors = $modelForm->mpHeatLossPercent->renderErrors();
+                $lpErrors = $modelForm->lpHeatLossPercent->renderErrors();
+                if ($hpErrors or $mpErrors or $lpErrors){
+                echo "<td>";
+                    if ($hpErrors) echo "<h3>".$this->translator->_('High Pressure').":</h3> {$hpErrors}"; 
+                    if ($mpErrors) echo "<h3>".$this->translator->_('Medium Pressure').":</h3> {$mpErrors}"; 
+                    if ($lpErrors) echo "<h3>".$this->translator->_('Low Pressure').":</h3> {$lpErrors}"; 
+                echo "</td>";
+                }?>
+        </tr>
+    </table>
+    
+    
+    <table class="data">
+        <tr class="mpHeaderColumn">
+            <th><?php echo $this->translator->_('Desuperheat Steam into MP');?>*</th>
+            <td><?php echo $modelForm->desuperHeatHpMp->renderViewHelper();?></td>
+            <td><?php echo $modelForm->desuperHeatHpMpTemp->renderViewHelper().' '.$mS->label('temperature');?></td>
+                <?php if ($errors = $modelForm->desuperHeatHpMpTemp->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+        <tr class="lpHeaderColumn">
+            <th><?php echo $this->translator->_('Desuperheat Steam into LP');?>*</th>
+            <td><?php echo $modelForm->desuperHeatMpLp->renderViewHelper();?></td>
+            <td><?php echo $modelForm->desuperHeatMpLpTemp->renderViewHelper().' '.$mS->label('temperature');?></td>
+        <?php if ($errors = $modelForm->desuperHeatMpLpTemp->renderErrors()) echo "<td>{$errors}</td>"; ?>
+        </tr>
+    </table>
+    
+    
+    <h2><?php echo $this->translator->_('Steam Turbine Details');?></h2>  
+    <?php 
+    $turbines = array(
+        'Cond' => 'Condensing Turbine',
+        'HpLp' => 'HP to LP Turbine',
+        'HpMp' => 'HP to MP Turbine',
+        'MpLp' => 'MP to LP Turbine',
+    );
+    foreach($turbines as $turbine => $turbineName){ 
+        $turbineOn = "turbine{$turbine}On";
+        $turbineIsoEff = "turbine{$turbine}IsoEff";
+        $turbineGenEff = "turbine{$turbine}GenEff";
+        $turbineMethod = "turbine{$turbine}Method";
+        $turbineFixedFlow = "turbine{$turbine}FixedFlow";
+        $turbineMinFlow = "turbine{$turbine}MinFlow";
+        $turbineMaxFlow = "turbine{$turbine}MaxFlow";
+        $turbineFixedPower = "turbine{$turbine}FixedPower";
+        $turbineMinPower = "turbine{$turbine}MinPower";
+        $turbineMaxPower = "turbine{$turbine}MaxPower";
+        
+        ?>
+        <table class="data" id="turbine<?php echo $turbine; ?>Table">
+            <tr>
+                <th style="width: 135px;"><?php echo $this->translator->_($turbineName);?></th>
+                <td style="width: 135px;"><?php echo $modelForm->$turbineOn->renderViewHelper();?> <?php echo $this->translator->_('On/Off');?></td>
+                    <?php if ($errors = $modelForm->$turbineOn->renderErrors()) echo "<td>{$errors}</td>"; ?>
+            </tr>
+            <tr id="<?php echo $turbine; ?>IsoEffRow">
+                <th><?php echo $this->translator->_('Isentropic Efficiency');?>*</th>
+                <td><?php echo $modelForm->$turbineIsoEff->renderViewHelper().' '.$mS->label('%');?></td>  
+                    <?php if ($errors = $modelForm->$turbineIsoEff->renderErrors()) echo "<td>{$errors}</td>"; ?>          
+            </tr>
+            <tr id="<?php echo $turbine; ?>GenEffRow">
+                <th><?php echo $this->translator->_('Generation Efficiency');?>*</th>
+                <td><?php echo $modelForm->$turbineGenEff->renderViewHelper().' '.$mS->label('%');?></td>  
+                    <?php if ($errors = $modelForm->$turbineGenEff->renderErrors()) echo "<td>{$errors}</td>"; ?>          
+            </tr>
+            <?php if ($turbine=='Cond'){ ?>            
+            <tr id="<?php echo $turbine; ?>OutletPressureRow">
+                <th><?php echo $this->translator->_('Condenser Pressure');?>*</th>
+                <td><?php echo $modelForm->turbineCondOutletPressure->renderViewHelper().' '.$mS->label('vacuum');?></td>  
+                    <?php if ($errors = $modelForm->turbineCondOutletPressure->renderErrors()) echo "<td>{$errors}</td>"; ?>          
+            </tr>            
+            <?php } ?>
+            <tr id="<?php echo $turbine; ?>tMethodRow">
+                <th><?php echo $this->translator->_('Operation Type');?>*</th>
+                <td><?php echo $modelForm->$turbineMethod->renderViewHelper();?></td>
+                    <?php if ($errors = $modelForm->$turbineMethod->renderErrors()) echo "<td>{$errors}</td>"; ?>
+            </tr>
+            <tr id="<?php echo $turbine; ?>FixedFlowRow">
+                <th><?php echo $this->translator->_('Fixed Flow');?>*</th>
+                <td><?php echo $modelForm->$turbineFixedFlow->renderViewHelper().' '.$mS->label('massflow');?></td>
+                    <?php if ($errors = $modelForm->$turbineFixedFlow->renderErrors()) echo "<td>{$errors}</td>"; ?>
+            </tr>
+            <tr id="<?php echo $turbine; ?>MinFlowRow">
+                <th><?php echo $this->translator->_('Minimum Flow');?>*</th>
+                <td><?php echo $modelForm->$turbineMinFlow->renderViewHelper().' '.$mS->label('massflow');?></td>
+                    <?php if ($errors = $modelForm->$turbineMinFlow->renderErrors()) echo "<td>{$errors}</td>"; ?>
+            </tr>
+            <tr id="<?php echo $turbine; ?>MaxFlowRow">
+                <th><?php echo $this->translator->_('Maximum Flow');?>*</th>
+                <td><?php echo $modelForm->$turbineMaxFlow->renderViewHelper().' '.$mS->label('massflow');?></td>
+                    <?php if ($errors = $modelForm->$turbineMaxFlow->renderErrors()) echo "<td>{$errors}</td>"; ?>
+            </tr>
+            <tr id="<?php echo $turbine; ?>FixedPowerRow">
+                <th><?php echo $this->translator->_('Fixed Power');?>*</th>
+                <td><?php echo $modelForm->$turbineFixedPower->renderViewHelper().' '.$mS->label('power');?></td>
+                    <?php if ($errors = $modelForm->$turbineFixedPower->renderErrors()) echo "<td>{$errors}</td>"; ?>
+            </tr>
+            <tr id="<?php echo $turbine; ?>MinPowerRow">
+                <th><?php echo $this->translator->_('Minimum Power');?>*</th>
+                <td><?php echo $modelForm->$turbineMinPower->renderViewHelper().' '.$mS->label('power');?></td>
+                    <?php if ($errors = $modelForm->$turbineMinPower->renderErrors()) echo "<td>{$errors}</td>"; ?>
+            </tr>
+            <tr id="<?php echo $turbine; ?>MaxPowerRow">
+                <th><?php echo $this->translator->_('Maximum Power');?>*</th>
+                <td><?php echo $modelForm->$turbineMaxPower->renderViewHelper().' '.$mS->label('power');?></td>
+                    <?php if ($errors = $modelForm->$turbineMaxPower->renderErrors()) echo "<td>{$errors}</td>"; ?>
+            </tr>
+        </table>
+    <?php } ?>
+    
+    <?php echo $modelForm->Enter->renderViewHelper();?>
+</form>

@@ -1,0 +1,42 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+
+global $CURRENCY_SYMBOL; 
+
+$this->mS = Steam_MeasurementSystem::getInstance(); 
+$this->translator = Zend_Registry::get('Zend_Translate');   
+
+if (!$this->model->marginalCostCalculated){
+    $this->model->calculateMarginalCosts(); 
+}
+
+$tmp = explode("/",$this->mS->selected['massflow']);
+$label = "<span style=\"font-style: italic; color: grey;\"> / ".$tmp[0]."</span>";
+
+?>
+<h2><?php echo $this->translator->_('Marginal Steam Cost');?></h2>
+<table class="data">
+    <tr>
+        <th><?php echo $this->translator->_('HP');?></th>
+        <td><?php echo $CURRENCY_SYMBOL.' '.number_format($this->mS->localize($this->model->marginalCostHP,'unitcost.massflow'),2).$label;?></td>
+    </tr>
+    <?php if ($this->model->headerCount>2){ ?>
+    <tr>
+        <th><?php echo $this->translator->_('MP');?></th>
+        <td><?php echo $CURRENCY_SYMBOL.' '.number_format($this->mS->localize($this->model->marginalCostMP,'unitcost.massflow'),2).$label;?></td>
+    </tr>
+    <?php } ?>
+    <?php if ($this->model->headerCount>1){ ?>
+    <tr>
+        <th><?php echo $this->translator->_('LP');?></th>
+        <td><?php echo $CURRENCY_SYMBOL.' '.number_format($this->mS->localize($this->model->marginalCostLP,'unitcost.massflow'),2).$label;?></td>
+    </tr>
+    <?php } ?>
+</table>

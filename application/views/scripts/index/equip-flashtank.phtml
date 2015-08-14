@@ -1,0 +1,269 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Equipment Calculators
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$titles = Steam_Support::descriptions('Equipment', 'flashtank');
+$linkLocation = 'equipFlashtank';
+?>
+<h1><?php echo $this->translator->_($titles[0]." Calculator");?>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="tutorials?vid=flash"><?php echo $this->translator->_("watch tutorial");?></a></span>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="SSMTGuide.pdf#page=27"><?php echo $this->translator->_("view guide");?></a></span>
+</h1>
+<h3><?php echo $this->translator->_($titles[1]);?></h3><BR>
+    
+<?php
+$mS = Steam_MeasurementSystem::getInstance();
+$flashTankForm = new Steam_Forms_FlashTank();
+$formValid = false;
+//Load Saved Form Data
+$formData = new Zend_Session_Namespace('formData');
+
+//Populate, validate, or reset form
+if (isset($_GET['reset'])) unset($formData->flashtank);
+$examples = Steam_DataGenerator::examples('flashtank');
+if (isset($_GET['random']) and isset($examples[$_GET['random']])) $_POST = Steam_DataGenerator::flashTank($_GET['random']);
+if (!isset($_POST['Enter']) and isset($formData->flashtank)){
+    $_POST = $formData->flashtank->unload();
+    $_POST['Enter'] = 'Enter';
+}
+if (isset($_POST['Enter'])){
+    if ($formValid = $flashTankForm->isValid($_POST) ){
+        $formData->flashtank = new Steam_DTO('flashtank', $flashTankForm->getValues() );    
+    }
+}
+?>    
+
+<script type="text/javascript">
+    $(document).ready(function() {               
+        $('#examplesA').hide();             
+        $('#examplesHint').show();  
+        
+        $('#exampleTable').mouseover(function(){ $('#examplesA').show();$('#examplesHint').hide(); });
+        $('#exampleTable').mouseout(function(){ $('#examplesA').hide(); $('#examplesHint').show();}); 
+                                  
+        <?php echo Steam_StdForm::hintDetails(array(
+                          'type' => 'massflow',
+                          'fieldID' => "massFlow",
+                          'title' => "Mass Flow",                        
+                          'text' => "Mass flow of steam (or liquid).",                        
+                      ));   
+        echo Steam_StdForm::hintDetails(array(
+                          'type' => 'critPressure',
+                          'fieldID' => "tankPressure",
+                          'title' => "Flash Tank Pressure",                        
+                          'text' => "Pressure of flash tank and outlet gas and liquid.<br><span style='font-style: italic; color: red;'>Must also be below Inlet Pressure</span>",
+                      ));   
+        echo $flashTankForm->jqueryAdd(); ?>                                   
+    });
+</script>
+
+<div style="position: relative; height: 265px;">
+    <div style="position: absolute; top: 0px; left: 0px;"> 
+        <form method="POST" action="<?php echo $linkLocation; ?>">
+            <table class='data'>
+                <tr><td colspan="2" style="text-align:center;"><h3><?php echo $this->translator->_('Inlet');?></h3></td></tr>
+                <?php echo $flashTankForm->displaySteamFields('Inlet'); ?>
+                <tr>
+                    <th><?php echo $this->translator->_('Mass Flow');?> *</th><td><?php echo $flashTankForm->massFlow->renderViewhelper()." ".$mS->label('massflow');?></td>
+                        <?php if ($errors = $flashTankForm->massFlow->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr><td colspan="2"></td></tr>
+                <tr>
+                    <th><?php echo $this->translator->_('Tank Pressure');?> *</th><td><?php echo $flashTankForm->tankPressure->renderViewhelper()." ".$mS->label('pressure');?></td>
+                        <?php if ($errors = $flashTankForm->tankPressure->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr><td><span style="font-style:italic; color: grey;">* <?php echo $this->translator->_('Required');?></span></td><td style="text-align: center;"><?php echo $flashTankForm->Enter->renderViewhelper();?>
+                    <?php if ($formValid) echo "<span style='font-size: 1em; margin-left: 10px;'>[<a href=\"{$linkLocation}?reset=1\">{$this->translator->_('reset')}</a>]</span>";?></td></tr>
+            </table>
+        </form>
+        <?php echo $this->partial('/index/partials/dataFieldHint.phtml'); ?>
+        <?php 
+        if (isset($_GET['random']) and isset($examples[$_GET['random']])) 
+            echo "<span style='font-style: italic; color: darkblue;'>**".$this->translate("Example").": ".$this->translate($examples[$_GET['random']])."</span><BR><BR>"; ?>    
+        <table class="data" id='exampleTable'>
+            <tr>
+                <th rowspan="2" style="vertical-align: middle;"><?php echo $this->translate('Examples'); ?>:</th>
+                <td id="examplesHint" style="color: grey; font-style: italic;"><?php echo $this->translate('Mouse Over'); ?></td>
+            </tr><tr id='examplesA' style="background-color: white;z-index: 30;">
+                <?php foreach($examples as $key => $label): ?>
+                <td><a href="<?php echo $linkLocation;?>?random=<?php echo $key;?>"><?php echo $this->translate($label);?></a></td>
+                <?php endforeach;?>
+            </tr>
+        </table>
+        <div style="width: 280px">
+            <h3 style><?php echo $this->translator->_('Calculation Details and Assumptions below');?></h3>
+        </div>
+    </div>
+    <?php
+    if ($formValid){
+
+
+        $inletSteam = $flashTankForm->getSteamObject('Inlet');
+        $inletSteam->setMassFlow($mS->standardize($_POST['massFlow'],'massflow'));
+        $flashTankObject = new Steam_Equipment_FlashTank($inletSteam, $mS->standardize($_POST['tankPressure'],'pressure'));
+
+    ?>
+
+
+    <div style="float: right; position: relative; width: 470px; height: 500px; margin-right: 20px;">
+            <?php echo Steam_Support::displayWarnings($flashTankObject);?>    
+
+        <div style="position: relative;">
+    <div style="position: relative; z-index: 10;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $flashTankObject->inletSteam, 'steamName' => 'Inlet Water'));?>
+    </div>
+  
+              
+
+    <div style="position: absolute; left: 68px; top: 150px; z-index: 10;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $flashTankObject->satGas, 'steamName' => 'Outlet Gas'));?>
+    </div>
+    <img id="equipment1" src="images/equipment/FlashTk.gif" style="position: absolute; top:280px; left: 212px; width:50px; height:50px; z-index: 10;" alt="Flash Tank">
+    <?php
+$tmp = new Steam_Model_Renderer();
+echo $tmp->drawPipe( 80, 33, 306, 228, 'vh','Purple');
+
+echo $tmp->drawSteamPoint(125, 33, 'Down.Right', 'Fine');
+echo $tmp->drawPipe( 260, 238, 305, 238, 'vh','Red');
+echo $tmp->drawPipe( 305, 238, 368, 238, 'vh','Blue');
+echo $tmp->drawSteamPoint(271, 238, 'Up.Right', 'Fine');
+echo $tmp->drawSteamPoint(338, 238, 'Down.Right', 'Fine');
+?>
+    
+    <div style="position: absolute; left: 68px; top: 350px; z-index: 10;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $flashTankObject->satLiquid, 'steamName' => 'Outlet Liquid'));?>
+    </div>
+    
+    <div style="position: absolute; top:295px; left: 260px; ">  
+        <h2><?php echo $this->translator->_('Flash Tank');?></h2>
+    </div>
+</div>
+        </div>
+
+<?php
+    
+    
+}?>
+
+</div>
+<br style='clear: both;'>
+
+<h2><?php echo $this->translator->_('Calculation Details');?></h2>
+<h3><?php echo $this->translator->_('Step 1: Determine Inlet Water Properties');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Inlet Pressure '.
+    'and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality)');?>:</span>
+<?php if ($formValid){ 
+    $steamObject = $flashTankObject->inletSteam; 
+    $secParaDets = Steam_StdForm::secondParameterDetails($flashTankForm->getValue('InletSecondParameter')); ?>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($steamObject->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_($secParaDets[0]);?></var> = <?php echo $mS->$secParaDets[2]($steamObject->$secParaDets[1]);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($steamObject, $flashTankForm->getValue('InletSecondParameter'));?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?></span></li>     
+</ul>    
+<?php }else{ echo "<BR>";}  ?>
+
+
+<h3><?php echo $this->translator->_('Step 2: Determine the Specific Enthalpy and other properties for Saturated Liquid and Gas at Flash Pressure');?></h3>
+<?php if ($formValid){ ?>
+<ul>
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($flashTankObject->satGas->pressure);?></span></li>
+    <li><a href="propSaturated?Pressure=<?php echo $mS->rawPressure($flashTankObject->satGas->pressure);?>">[<?php echo $this->translator->_('Saturated Properties Calculator');?>]</a> =><ul>
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Saturated Liquid: Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($flashTankObject->satLiquid->specificEnthalpy);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Saturated Gas: Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($flashTankObject->satGas->specificEnthalpy);?></span></li>
+    </ul></li>
+</ul>
+<?php }else{ echo "<BR>";}  ?>
+
+<h3><?php echo $this->translator->_('Step 3: Evaluate Flash Tank');?></h3>
+<span class="equationDescriptions">><?php echo $this->translator->_('If Inlet Specific Enthalpy is less than the Saturated Liquid Specific Enthalpy, only liquid leaves the flash tank at inlet specific enthalpy and flash tank pressure.');?></span>
+    <?php if ($formValid and $flashTankObject->satGas->massFlow==0){ ?>
+    <ul>           
+        <li><span class="equationValues"><?php echo $this->translator->_('Outlet Liquid Only');?></span></li>
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($flashTankObject->satLiquid->pressure);?></span></li>
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($flashTankObject->satLiquid->specificEnthalpy);?></span></li>    
+        <li><a href="<?php echo Steam_StdForm::propLink($flashTankObject->satLiquid, 'SpecificEnthalpy');?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> =>
+        <span class="equationValues"><var><?php echo $this->translator->_('Temperature');?></var> = <?php echo $mS->displayTemperatureLabeled($flashTankObject->satLiquid->temperature);?></span></li>
+    </ul><?php } ?>  
+<br>   
+<span class="equationDescriptions">><?php echo $this->translator->_('If Inlet Specific Enthalpy is greater than the Saturated Gas Specific Enthalpy, only Steam leaves the flash tank at inlet specific enthalpy and flash tank pressure.');?></span>
+    <?php if ($formValid and $flashTankObject->satLiquid->massFlow==0){ ?>
+    <ul>   
+        <li><span class="equationValues"><?php echo $this->translator->_('Outlet Steam Only');?></span></li>
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($flashTankObject->satGas->pressure);?></span></li>
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($flashTankObject->satGas->specificEnthalpy);?></span></li>    
+        <li><a href="<?php echo Steam_StdForm::propLink($flashTankObject->satGas, 'SpecificEnthalpy');?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> =>
+        <span class="equationValues"><var><?php echo $this->translator->_('Temperature');?></var> = <?php echo $mS->displayTemperatureLabeled($flashTankObject->satGas->temperature);?></span></li>
+    </ul><?php } ?>  
+<br>   
+<span class="equationDescriptions">><?php echo $this->translator->_('If Inlet Specific Enthalpy is in between, proceed to Step 4');?></span>
+<?php if ($formValid and $flashTankObject->satGas->massFlow<>0 and $flashTankObject->satLiquid->massFlow<>0){ ?>
+<ul><li><span class="equationValues"><?php echo $this->translator->_('Proceed to Step 4');?></span></li></ul>
+<?php }else{ echo "<br>";} ?>  
+
+
+
+<h3><?php echo $this->translator->_('Step 4: Determine Flash Properties');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using an mass and energy balance equations');?>:</span>
+    <ol>   
+        <li><var><?php echo $this->translator->_('Mass Flow');?></var> = <var><?php echo $this->translator->_('MF');?></var></li>
+        <li><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <var><?php echo $this->translator->_('SE');?></var></li>
+        <li><var><?php echo $this->translator->_('Energy Flow');?></var> = <var><?php echo $this->translator->_('MF');?></var> * <var><?php echo $this->translator->_('SE');?></var></li>
+            
+            
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Inlet Water MF');?></var> = <var><?php echo $this->translator->_('Outlet Gas MF');?></var> + <var><?php echo $this->translator->_('Outlet Liquid MF');?></var></span></li>        
+        <li><span class="equationValues">[<var><?php echo $this->translator->_('Inlet Water MF');?></var> * <var><?php echo $this->translator->_('Inlet Water SE');?></var>]
+                = [<var><?php echo $this->translator->_('Outlet Gas MF');?></var> * <var><?php echo $this->translator->_('Outlet Gas SE');?></var>] 
+                + [<var><?php echo $this->translator->_('Outlet Liquid MF');?></var> * <var><?php echo $this->translator->_('Outlet Liquid SE');?></var>]</span></li>                
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Outlet Gas MF');?></var> = <var><?php echo $this->translator->_('Inlet Water MF');?></var> - <var><?php echo $this->translator->_('Outlet Liquid MF');?></var></span></li>                
+        <li><span class="equationValues">[<var><?php echo $this->translator->_('Inlet Water MF');?></var> * <var><?php echo $this->translator->_('Inlet Water SE');?></var>]
+                = [(<var><?php echo $this->translator->_('Inlet Water MF');?></var> - <var><?php echo $this->translator->_('Outlet Liquid MF');?></var>) * <var><?php echo $this->translator->_('Outlet Gas SE');?></var>] 
+                + [<var><?php echo $this->translator->_('Outlet Liquid MF');?></var> * <var><?php echo $this->translator->_('Outlet Liquid SE');?></var>]</span></li>
+        <li><span class="equationValues">[<var><?php echo $this->translator->_('Inlet Water MF');?></var> * <var><?php echo $this->translator->_('Inlet Water SE');?></var>]
+                = [<var><?php echo $this->translator->_('Inlet Water MF');?></var> * <var><?php echo $this->translator->_('Outlet Gas SE');?></var>] + [<var><?php echo $this->translator->_('Outlet Liquid MF');?></var> * <var><?php echo $this->translator->_('Outlet Liquid SE');?></var>] 
+                - [<var><?php echo $this->translator->_('Outlet Liquid MF');?></var> * <var><?php echo $this->translator->_('Outlet Gas SE');?></var>] </span></li>
+        <li><span class="equationValues">[<var><?php echo $this->translator->_('Outlet Liquid MF');?></var> * <var><?php echo $this->translator->_('Outlet Liquid SE');?></var>] 
+                - [<var><?php echo $this->translator->_('Outlet Liquid MF');?></var> * <var><?php echo $this->translator->_('Outlet Gas SE');?></var>] 
+                = [<var><?php echo $this->translator->_('Inlet Water MF');?></var> * <var><?php echo $this->translator->_('Inlet Water SE');?></var>] - 
+                [<var><?php echo $this->translator->_('Inlet Water MF');?></var> * <var><?php echo $this->translator->_('Outlet Gas SE');?></var>]</span></li>
+        <li><span class="equationValues">[<var><?php echo $this->translator->_('Outlet Liquid MF');?></var> * (<var><?php echo $this->translator->_('Outlet Liquid SE');?></var> 
+                - <var><?php echo $this->translator->_('Outlet Gas SE');?></var>)] 
+                = [<var><?php echo $this->translator->_('Inlet Water MF');?></var> * (<var><?php echo $this->translator->_('Inlet Water SE');?></var> -
+                 <var><?php echo $this->translator->_('Outlet Gas SE');?></var>)]</span></li>
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Outlet Liquid MF');?></var> =  
+                 <var><?php echo $this->translator->_('Inlet Water MF');?></var> * (<var><?php echo $this->translator->_('Inlet Water SE');?></var> -
+                 <var><?php echo $this->translator->_('Outlet Gas SE');?></var>) / (<var><?php echo $this->translator->_('Outlet Liquid SE');?></var> 
+                - <var><?php echo $this->translator->_('Outlet Gas SE');?></var>)</span>
+            <?php if ($formValid and $flashTankObject->satGas->massFlow<>0 and $flashTankObject->satLiquid->massFlow<>0){ ?>
+            <br>[<span class="equationValues"><var><?php echo $this->translator->_('Outlet Liquid MF');?></var> = <?php echo $mS->displayMassflowLabeled($flashTankObject->satLiquid->massFlow);?> = 
+                 <?php echo $mS->displayMassflowLabeled($flashTankObject->inletSteam->massFlow);?> * (<?php echo $mS->displaySpecificEnthalpyLabeled($flashTankObject->inletSteam->specificEnthalpy);?> -
+                 <?php echo $mS->displaySpecificEnthalpyLabeled($flashTankObject->satGas->specificEnthalpy);?>) / (<?php echo $mS->displaySpecificEnthalpyLabeled($flashTankObject->satLiquid->specificEnthalpy);?> 
+                - <?php echo $mS->displaySpecificEnthalpyLabeled($flashTankObject->satGas->specificEnthalpy);?>)</span>]
+            <?php }?>
+            </li>
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Outlet Gas MF');?></var> = <var><?php echo $this->translator->_('Inlet Water MF');?></var> - <var><?php echo $this->translator->_('Outlet Liquid MF');?></var></span>
+            <?php if ($formValid and $flashTankObject->satGas->massFlow<>0 and $flashTankObject->satLiquid->massFlow<>0){ ?>
+            <br>[<span class="equationValues"><var><?php echo $this->translator->_('Outlet Gas MF');?></var> = <?php echo $mS->displayMassflowLabeled($flashTankObject->satGas->massFlow);?> = 
+                 <?php echo $mS->displayMassflowLabeled($flashTankObject->inletSteam->massFlow);?> - <?php echo $mS->displayMassflowLabeled($flashTankObject->satLiquid->massFlow);?></span>]
+            <?php }?></li>
+    </ol>
+
+
+<h2><?php echo $this->translator->_('Assumptions');?></h2>
+<ul>
+    <li><?php echo $this->translator->_('Total Inlet and Outlet Mass flows are equal. No mass is lost or gained.');?></li>
+    <li><?php echo $this->translator->_('Total Inlet and Outlet Energy flows are equal. No energy is lost or gained.');?></li>
+</ul>

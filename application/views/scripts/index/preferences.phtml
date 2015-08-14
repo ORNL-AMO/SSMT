@@ -1,0 +1,141 @@
+<?php
+/**
+ * Steam Calculators
+ * 
+ * Set Preferences
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+?>
+ <script type="text/javascript">
+    $(document).ready(function() {                     
+        highlightSystem()
+        
+        $('#systemSelected').change(function(){highlightSystem()});
+        
+        $('td[id^="imperial"]').mousedown(function(){
+            $('#systemSelected').val('Imperial');
+            highlightSystem();
+        });
+        
+        $('td[id^="si"]').mousedown(function(){
+            $('#systemSelected').val('SI');
+            highlightSystem();
+        });
+        
+        $('td[id^="chinese"]').mousedown(function(){
+            $('#systemSelected').val('Chinese');
+            highlightSystem();
+        });
+        
+        $('td[id^="test"]').mousedown(function(){
+            $('#systemSelected').val('testSystem');
+            highlightSystem();
+        });
+        
+        function highlightSystem() {
+            $('td[id^="imperial"]').css('background-color', '#FFF');
+            $('td[id^="si"]').css('background-color', '#FFF');
+            $('td[id^="chinese"]').css('background-color', '#FFF');
+            $('td[id^="test"]').css('background-color', '#FFF');
+            if ($('#systemSelected').val() == 'Custom'){
+                $('td[id^="custom"]').show('fast');
+                $('td[id^="custom"]').css('background-color', '#DDD');
+                $('th[id^="custom"]').show('fast');
+            }else{       
+                $('td[id^="custom"]').hide();
+                $('th[id^="custom"]').hide();
+                if ($('#systemSelected').val() == 'Imperial'){
+                    $('td[id^="imperial"]').css('background-color', '#DDD');
+                }
+                if ($('#systemSelected').val() == 'SI'){
+                    $('td[id^="si"]').css('background-color', '#DDD');
+                }
+                if ($('#systemSelected').val() == 'Chinese'){
+                    $('td[id^=chinese]').css('background-color', '#DDD');
+                }
+                if ($('#systemSelected').val() == 'testSystem'){
+                    $('td[id^="test"]').css('background-color', '#DDD');
+                }            
+            }
+        }
+    });
+</script>
+
+<h1><?php echo $this->translate('Preferences');?>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="tutorials?vid=custom"><?php echo $this->translator->_("watch tutorial");?></a></span>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="SSMTGuide.pdf#page=10"><?php echo $this->translator->_("view guide");?></a></span>
+</h1>
+<h3><?php echo $this->translate('Set preferred unit systems, individual units, and languages.');?></h3>
+
+<?php echo $this->steamModelCommunicator->status(); ?>
+<br>
+
+<form enctype="application/x-www-form-urlencoded" action="?" method="post"> 
+    <table class="data">
+        <tr>
+            <th><?php echo $this->translate('Language');?></th>
+            <td><?php echo $this->prefForm->language->renderViewHelper(); ?></td>
+        </tr>
+    </table>
+    <br>
+    
+    <table class="data">
+        <tr>
+            <th><?php echo $this->translate('Currency Symbol');?></th>
+            <td><?php echo $this->prefForm->currencySymbol->renderViewHelper(); ?></td>
+        </tr>
+    </table>
+    <br>
+    
+    <table class="data">
+        <tr>
+            <th><?php echo $this->translate('Measurement System');?></th>
+            <td><?php echo $this->prefForm->systemSelected->renderViewHelper(); ?>
+         <span style="font-style: italic; color: blue; padding: 5px;">*<?php echo $this->translate("Select 'Custom' to pick individual units.");?></span></td>
+        </tr>
+    </table>
+    <br>
+    
+    <?php         
+    $systemUnitTypes = Steam_MeasurementSystem::unitTypes();
+    $systemDefaults = Steam_MeasurementSystem::defaultUnits();
+    $mS = Steam_MeasurementSystem::getInstance();
+    ?>
+    <table class="data" id="customUnits">
+        <tr>
+            <td></td>
+            <th><?php echo $this->translate('Imperial');?></th>
+            <th>SI</th>
+            <th><?php echo $this->translate('Chinese');?></th>
+            <th id="customTitle"><?php echo $this->translate('Custom');?></th>   
+        </tr>
+        <?php foreach($systemUnitTypes as $type => $name): ?>
+        <tr>
+            <th><?php echo $this->translate($name);?></th>
+            <td class="c" id="<?php echo 'imperial'.$type; ?>"><?php echo $mS->masterConversionList[$type][1][$systemDefaults['Imperial'][$type]][3]; ?></td>
+            <td class="c" id="<?php echo 'si'.$type; ?>"><?php echo $mS->masterConversionList[$type][1][$systemDefaults['SI'][$type]][3]; ?></td>
+            <td class="c" id="<?php echo 'chinese'.$type; ?>"><?php echo $mS->masterConversionList[$type][1][$systemDefaults['Chinese'][$type]][3]; ?></td>
+            <?php /*<td class="c" id="<?php echo 'test'.$type; ?>"><?php echo $systemDefaults['testSystem'][$type]; ?></td>*/ ?>
+            <td id="<?php echo 'custom'.$type; ?>"><?php echo $this->prefForm->$type->renderViewHelper(); ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+    <br>
+        
+    <table class="data">
+        <tr>
+            <th><?php echo $this->translate('Permanently Store Preferences');?></th>
+            <td><?php echo $this->prefForm->presistent->renderViewHelper(); ?></td>
+        </tr>
+    </table>
+    <br>
+    <?php echo $this->prefForm->Enter->renderViewHelper(); ?>    
+    
+</form>

@@ -1,0 +1,250 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Properties Calculators
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$titles = Steam_Support::descriptions('Properties', 'satProps');
+$linkLocation = 'propSaturated';
+?>
+<h1><?php echo $this->translator->_($titles[0]." Calculator");?>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="tutorials?vid=steam"><?php echo $this->translator->_("watch tutorial");?></a></span>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="SSMTGuide.pdf#page=14"><?php echo $this->translator->_("view guide");?></a></span>
+</h1>
+<h3><?php echo $this->translator->_($titles[1]);?></h3><BR>
+
+<?php
+$mS = Steam_MeasurementSystem::getInstance();
+$steamForm = new Steam_Forms_SaturatedProperties();
+$formValid = false;
+//Load Saved Form Data
+$formData = new Zend_Session_Namespace('formData');
+//Load Saved Steam Properties Data
+$steamPropertyList = new Zend_Session_Namespace('steamPropertyList');
+
+//Populate, validate, or reset form
+$examples = Steam_DataGenerator::examples('satProps');
+if (isset($_GET['random']) and isset($examples[$_GET['random']]) ) $_POST = Steam_DataGenerator::satCalc($_GET['random']);
+//Load Last Calculation if in printable view
+if (isset($_GET['pv']) and isset($formData->satProperties)){
+    $_POST = $formData->satProperties;
+    $_POST['Enter'] = 'Enter';
+}
+//Load Field Data for GET if detected
+if (isset($_GET['Pressure'])){
+    $_POST = $_GET;
+    $_POST['using'] = 'pressure';
+    $_POST['Enter'] = 'Enter';    
+}
+
+//Clear Steam Property List if Requested
+if (isset($_GET['clear']) and $_GET['clear']=='List') $steamPropertyList->satProps = array();
+
+//Calculator steam properties if data entered and form valid
+if (isset($_POST['Enter'])) {
+    if ($formValid = $steamForm->isValid($_POST) ){
+        $formData->satProperties = $steamForm->getValues();
+        
+        //Calculate Properties
+        $IAPWS = new Steam_IAPWS();
+        if ($steamForm->getValue('using')=='pressure') $properties = $IAPWS->saturatedPropertiesByPressure($mS->standardize($steamForm->getValue('Pressure'),'pressure'));
+        if ($steamForm->getValue('using')=='temperature') $properties = $IAPWS->saturatedPropertiesByTemperature($mS->standardize($steamForm->getValue('Temperature'),'temperature'));        
+        
+        //Save Properties
+        if (is_array($steamPropertyList->satProps) ){
+            array_unshift($steamPropertyList->satProps, $properties);
+        }else{
+            $steamPropertyList->satProps = array($properties);
+        }
+        //Limit List to 20
+        if (count($steamPropertyList->satProps)>20) array_pop ($steamPropertyList->satProps);    
+    }
+}else{
+    //Clear Saved Form Data if none submitted
+    unset($formData->satProperties);
+}
+?>
+
+<script>
+    $(document).ready(function() {               
+        $('#examplesA').hide();             
+        $('#examplesHint').show();         
+        
+        $('#exampleTable').mouseover(function(){ $('#examplesA').show();$('#examplesHint').hide(); });
+        $('#exampleTable').mouseout(function(){ $('#examplesA').hide(); $('#examplesHint').show();});
+            
+        showPicked();
+        $('#using').change(function(){
+           showPicked();
+        });
+        function showPicked(){
+            $('#temperatureRow').hide();
+            $('#pressureRow').hide();
+            $('#' + $('#using').val() + 'Row').show();
+        }
+           
+        <?php echo Steam_StdForm::hintDetails(array(
+                        'type' => 'critPressure',
+                        'fieldID' => "Pressure",
+                        'title' => "Pressure",                        
+                        'text' => "Pressure cannot be above critical point as there is no longer a phase change.",
+                    ));
+        echo Steam_StdForm::hintDetails(array(
+                        'type' => 'critTemperature',
+                        'fieldID' => "Temperature",
+                        'title' => "Temperature",
+                        'text' => "Temperature cannot be above critical point as there is no longer a phase change.",
+                    )); 
+        echo $steamForm->jqueryAdd(); ?>     
+                
+    });
+    </script>
+    
+<div style="position: relative; ">
+    <div>
+        <form method="POST" action="<?php echo $linkLocation; ?>">        
+            <table class='data'>
+                <tr>
+                    <th><?php echo $steamForm->using->renderViewhelper();?> *</th>
+                    <td>
+                    <span id="temperatureRow"><?php echo $steamForm->Temperature->renderViewhelper()." ".$mS->label('temperature');?></span>
+                    <span id="pressureRow"><?php echo $steamForm->Pressure->renderViewhelper()." ".$mS->label('pressure');?></span>
+                    </td>
+                    <?php if ($errors = $steamForm->Pressure->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                    <?php if ($errors = $steamForm->Temperature->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr>
+                    <td><span style="font-style:italic; color: grey;">* <?php echo $this->translate('Required');?></span></td>
+                    <td style="text-align: center;"><?php echo $steamForm->Enter->renderViewhelper();?></td>
+                </tr>
+            </table>  
+        </form>
+        <?php echo $this->partial('/index/partials/dataFieldHint.phtml'); ?>
+        <?php 
+        if (isset($_GET['random']) and isset($examples[$_GET['random']])) 
+            echo "<span style='font-style: italic; color: darkblue;'>**".$this->translate("Example").": ".$this->translate($examples[$_GET['random']])."</span><BR><BR>"; ?>    
+        <table class="data" id='exampleTable'>
+            <tr>
+                <th rowspan="2" style="vertical-align: middle;"><?php echo $this->translate('Examples'); ?>:</th>
+                <td id="examplesHint" style="color: grey; font-style: italic;"><?php echo $this->translate('Mouse Over'); ?></td>
+            </tr><tr id='examplesA' style="background-color: white;z-index: 30;">
+                <?php foreach($examples as $key => $label): ?>
+                <td><a href="<?php echo $linkLocation;?>?random=<?php echo $key;?>"><?php echo $this->translate($label);?></a></td>
+                <?php endforeach;?>
+            </tr>     
+        </table>   
+    </div>
+</div>
+    
+<?php if ($formValid) { ?>
+    <div style="float: left; width: 410px;">
+        <h3><?php echo $this->translate('Steam Properties'); ?></h3>
+        <table class="data">
+            <tr>
+                <th></th>
+                <th style="width: 60px;"><?php echo $this->translate('Saturated Liquid'); ?></th>
+                <th style="width: 60px;"><?php echo $this->translate('Evaporation'); ?></th>
+                <th style="width: 60px;"><?php echo $this->translate('Saturated Gas'); ?></th>
+                <th style="width: 60px;"><?php echo $this->translate('units'); ?></th>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Pressure'); ?></th>
+                <td colspan="3" style="text-align: center;<?php if ( $steamForm->getValue('using')=='pressure' ) echo "font-weight: bold;"; ?>"><?php echo $mS->displayPressure($properties['pressure']);?></td>         
+                <td style="text-align: center;"><?php echo $mS->label('pressure');?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Temperature'); ?></th>
+                <td colspan="3" style="text-align: center;<?php if ( $steamForm->getValue('using')=='temperature' ) echo "font-weight: bold;"; ?>"><?php echo $mS->displayTemperature($properties['temperature']);?></td>            
+                <td style="text-align: center;"><?php echo $mS->label('temperature');?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Specific Enthalpy'); ?></th>
+                <td style="text-align: center;"><?php echo $mS->displaySpecificEnthalpy($properties['liquid']['specificEnthalpy']);?></td>
+                <td style="text-align: center;"><?php echo $mS->displaySpecificEnthalpy($properties['gas']['specificEnthalpy']-$properties['liquid']['specificEnthalpy']);?></td>
+                <td style="text-align: center;"><?php echo $mS->displaySpecificEnthalpy($properties['gas']['specificEnthalpy']);?></td>
+                <td style="text-align: center;"><?php echo $mS->label('specificEnthalpy');?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Specific Entropy'); ?></th>
+                <td style="text-align: center;"><?php echo $mS->displaySpecificEntropy($properties['liquid']['specificEntropy']);?></td>
+                <td style="text-align: center;"><?php echo $mS->displaySpecificEntropy($properties['gas']['specificEntropy']-$properties['liquid']['specificEntropy']);?></td>
+                <td style="text-align: center;"><?php echo $mS->displaySpecificEntropy($properties['gas']['specificEntropy']);?></td>
+                <td style="text-align: center;"><?php echo $mS->label('specificEntropy');?></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Specific Volume'); ?></th>
+                <td style="text-align: center;"><?php echo $mS->displaySpecificVolume($properties['liquid']['specificVolume']);?></td>
+                <td style="text-align: center;"><?php echo $mS->displaySpecificVolume($properties['gas']['specificVolume']-$properties['liquid']['specificVolume']);?></td>
+                <td style="text-align: center;"><?php echo $mS->displaySpecificVolume($properties['gas']['specificVolume']);?></td>
+                <td style="text-align: center;"><?php echo $mS->label('specificVolume');?></td>
+            </tr>
+        </table>
+    </div>
+    <div style="float: left;">
+        <h3><?php echo $this->translate('Temperature-Entropy Diagram'); ?></h3>
+        <?php echo "<img src='diagramts?satT={$properties['temperature']}&amp;"
+        ."entropyLiquid={$properties['liquid']['specificEntropy']}&amp;"
+        ."entropyGas={$properties['gas']['specificEntropy']}&amp;'"
+        ." style=\"border: 1px solid black\" alt='Temperature-Entropy Diagram'>"; ?>
+    </div>
+<br style='clear: both;'><br>
+<?php }
+
+if (count($steamPropertyList->satProps)>0){ ?>
+    <br><h3><?php echo $this->translate('Recent Saturation Properties (max 20)');?> - [<a href='propertiesDownload'><?php echo $this->translate('download');?></a>] - [<a href='<?php echo $linkLocation; ?>?clear=List' onclick="return confirm('<?php echo $this->translate('Clear All Properties?');?>');"><?php echo $this->translate('clear');?></a>]</h3>            
+        <table class="data">
+            <tr>
+                <th rowspan="2"></th>
+                <th rowspan="2" style="vertical-align: middle;"><?php echo $this->translate('Pressure');?></th>
+                <th rowspan="2" style="vertical-align: middle;"><?php echo $this->translate('Temperature');?></th>
+                <th colspan="3"><?php echo $this->translate('Specific Enthalpy');?></th>
+                <th colspan="3"><?php echo $this->translate('Specific Entropy');?></th>
+                <th colspan="3"><?php echo $this->translate('Specific Volume');?></th>                
+            </tr>
+            <tr>
+                <th><?php echo $this->translate('Saturated Liquid');?></th>
+                <th><?php echo $this->translate('Evaporation');?></th>
+                <th><?php echo $this->translate('Saturated Gas');?></th>
+
+                <th><?php echo $this->translate('Saturated Liquid');?></th>
+                <th><?php echo $this->translate('Evaporation');?></th>
+                <th><?php echo $this->translate('Saturated Gas');?></th>
+
+                <th><?php echo $this->translate('Saturated Liquid');?></th>
+                <th><?php echo $this->translate('Evaporation');?></th>
+                <th><?php echo $this->translate('Saturated Gas');?></th>
+            </tr>
+            <tr>
+                <th></th>
+                <td><?php echo $mS->label('pressure');?></td>
+                <td><?php echo $mS->label('temperature');?></td>
+                <td colspan="3"><?php echo $mS->label('specificEnthalpy');?></td>
+                <td colspan="3"><?php echo $mS->label('specificEntropy');?></td>
+                <td colspan="3"><?php echo $mS->label('specificVolume');?></td>
+            </tr>
+        <?php
+    foreach($steamPropertyList->satProps as $properties){
+        echo "<tr><th></th>";
+        echo "<td>{$mS->displayPressure($properties['pressure'])}</td>";
+        echo "<td>{$mS->displayTemperature($properties['temperature'])}</td>";
+        echo "<td>{$mS->displaySpecificEnthalpy($properties['liquid']['specificEnthalpy'])}</td>";
+        echo "<td>{$mS->displaySpecificEnthalpy($properties['gas']['specificEnthalpy']-$properties['liquid']['specificEnthalpy'])}</td>";
+        echo "<td>{$mS->displaySpecificEnthalpy($properties['gas']['specificEnthalpy'])}</td>";
+        echo "<td>{$mS->displaySpecificEntropy($properties['liquid']['specificEntropy'])}</td>";
+        echo "<td>{$mS->displaySpecificEntropy($properties['gas']['specificEntropy']-$properties['liquid']['specificEntropy'])}</td>";
+        echo "<td>{$mS->displaySpecificEntropy($properties['gas']['specificEntropy'])}</td>";
+        echo "<td>{$mS->displaySpecificVolume($properties['liquid']['specificVolume'])}</td>";
+        echo "<td>{$mS->displaySpecificVolume($properties['gas']['specificVolume']-$properties['liquid']['specificVolume'])}</td>";
+        echo "<td>{$mS->displaySpecificVolume($properties['gas']['specificVolume'])}</td>";
+        echo "</tr>";
+    } ?></table>
+    <?php  
+}

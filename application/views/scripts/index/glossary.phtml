@@ -1,0 +1,102 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+?>
+<h1><?php echo $this->translate('Steam Calculators Glossary');?></h1>
+<?php 
+$mS = Steam_MeasurementSystem::getInstance();
+$glossary = array(
+    'Boiler Combustion Efficiency' => array(
+        $this->translate('The % of fuel energy that is directly added to the feedwater. Commonly 78% to 84%.') ),
+    
+    'Blowdown' => array(
+        $this->translate('Blowdown is saturated liquid continuously and/or routinely  drained from a boiler to control the concentration of dissolved solids. These solids have no other way of leaving the boiler and can be harmful to the boiler at excessive concentrations.') ),
+    
+    'Feedwater' => array(
+        $this->translate('Water that is fed into the boiler after having been filtered, chemically treated, heated, and/or pressurized.') ),
+    
+    'Enthalpy' => array(
+        $this->translate('A measurement of the total energy of a thermodynamic system.'),
+        "<span style=\"font-weight: bold\">".$this->translate('Specific Enthalpy')."</span> [".$mS->label('specificEnthalpy').'] '.$this->translate('A measurement of energy per unit mass.'),
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Enthalpy'>http://en.wikipedia.org/wiki/Enthalpy</a>"),
+    
+    'Entropy' => array(
+        $this->translate('A measure of the tendency of a process to be entropically favored, or to proceed in a particular direction.'),
+        '<span style="font-weight: bold">'.$this->translate('Specific Entropy')."</span> [".$mS->label('specificEntropy').'] '.$this->translate('A measurement of entropy per unit mass.'),
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Entropy'>http://en.wikipedia.org/wiki/Entropy</a>"),
+    
+    'Isentropic Efficiency' => array(
+        $this->translate('The energy actually removed as a percent (%) of the energy removed if the turbine were an isentropic process.'),
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Steam_turbine#Isentropic_turbine_efficiency'>http://en.wikipedia.org/wiki/Steam_turbine#Isentropic_turbine_efficiency</a>"),
+        
+    'Isentropic Process' => array(
+        $this->translate('A process that proceeds without any change in entropy.'),            
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Isentropic'>http://en.wikipedia.org/wiki/Isentropic</a>"),
+        
+    'Isenthalpic Process' => array(
+        $this->translate('A process that proceeds without any change in enthalpy.'),
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Isenthalpic'>http://en.wikipedia.org/wiki/Isenthalpic</a>"),
+        
+    'Deaerator' => array(
+        $this->translate('Removes dissolved gases from boiler feedwater by increasing the temperature to almost boiling.'),
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Deaerator'>http://en.wikipedia.org/wiki/Deaerator</a>"),
+        
+    'Steam Turbine' => array(
+        $this->translate('A device that extracts thermal energy from pressurized steam and uses it to do mechanical work on a rotating output shaft.'),
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Steam_turbine'>http://en.wikipedia.org/wiki/Steam_turbine</a>"),
+                
+    'Saturated Fluid (Liquid or Gas)' => array(
+        $this->translate('A substance that is at the vapor-liquid equilibrium which occurs at the pressure-dependent boiling point. The liquid and vapor components are individually referred to as Saturated Liquid and Saturated Gas/Vapor. If the substance is entirely one or the other, the individual component term can be used to describe the whole.').' <span style="font-style: italic;">'.$this->translate('Related: Quality').'</span>',
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Vapor%E2%80%93liquid_equilibrium'>http://en.wikipedia.org/wiki/Vapor-liquid_equilibrium</a>"),
+        
+    'Quality' => array(
+        $this->translate('The ratio of Saturated Gas/Vapor to total mass.'),
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Vapor_quality'>http://en.wikipedia.org/wiki/Vapor_quality</a>",),
+        
+    'Flash' => array(
+        $this->translate("The process involving the reduction in pressure of a liquid causing a portion to vaporize (Flash). A flash tank allows for the separation of the resulting liquid and gas.") ,
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Flash_evaporation'>http://en.wikipedia.org/wiki/Flash_evaporation</a>"),
+        
+    'Condensate' => array(
+        $this->translate('Condensed steam that is collected and, if suitable, returned the boiler.') ),
+        
+    'Make up Water' => array(
+        $this->translate('Water added to the system to make-up for steam and water losses.') ),
+        
+    'Contact Steam' => array(
+        $this->translate("Steam that comes in direct contact with the process materials. This cannot be collected and reused as it can potentially contain contaminants that can harm the system.") ),
+        
+    'Superheated Steam' => array(
+        $this->translate('Steam with a temperature above the boiling point for its pressure.') ),
+        
+    'Subcooled Liquid' => array(
+        $this->translate('Water with a temperature below the boiling point for its pressure.') ),
+        
+    'Triple-Point' => array(
+        $this->translate('The temperature and pressure at which the three phases (gas, liquid, and solid) of that substance coexist in thermodynamic equilibrium.'),
+        "[ ".$mS->displayPressureLabeled(PRESSURE_TRIPLE_POINT).", ".$mS->displayTemperatureLabeled(TEMPERATURE_TRIPLE_POINT)." ]",
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Triple_point'>http://en.wikipedia.org/wiki/Triple_point</a>"),
+        
+    'Critical-Point' => array(
+        $this->translate('The temperature and pressure at which the phase boundaries no longer exists.'),
+        "[ ".$mS->displayPressureLabeled(PRESSURE_CRITICAL_POINT).", ".$mS->displayTemperatureLabeled(TEMPERATURE_CRITICAL_POINT)." ]",
+        "<span style='font-style: italic;'>".$this->translate('Additional Info').":</span> <a href='http://en.wikipedia.org/wiki/Critical_point_%28thermodynamics%29'>http://en.wikipedia.org/wiki/Critical_point_(thermodynamics)</a>"),
+    
+); 
+ksort($glossary);
+?>
+<dl>
+<?php foreach($glossary as $term => $details){?>   
+    <dt><?php echo $this->translate($term); ?></dt>
+    <?php foreach($details as $key => $detail){?>
+        <dd><?php echo $detail; ?></dd>
+    <?php } ?>    
+<?php } ?>    
+</dl>
+    

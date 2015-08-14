@@ -1,0 +1,133 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Properties Calculators
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$titles = Steam_Support::descriptions('Properties', 'steamProps');
+$linkLocation = 'propSteam';
+?>
+<h1><?php echo $this->translator->_($titles[0]." Calculator");?>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="tutorials?vid=steam"><?php echo $this->translator->_("watch tutorial");?></a></span>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="SSMTGuide.pdf#page=14"><?php echo $this->translator->_("view guide");?></a></span>
+</h1>
+<h3><?php echo $this->translator->_($titles[1]);?></h3><BR>
+
+<?php
+$mS = Steam_MeasurementSystem::getInstance();
+$steamForm = new Steam_StdForm();
+$steamForm->addSteamFields();
+$formValid = false;
+//Load Saved Form Data
+$formData = new Zend_Session_Namespace('formData');
+//Load Saved Steam Properties Data
+$steamPropertyList = new Zend_Session_Namespace('steamPropertyList');
+
+//Populate, validate, or reset form
+$examples = Steam_DataGenerator::examples('steamProps');
+if (isset($_GET['random']) and isset($examples[$_GET['random']]) ) $_POST = Steam_DataGenerator::steamCalc($_GET['random']);
+//Load Last Calculation if in printable view
+if (isset($_GET['pv']) and isset($formData->steamProperties)){
+    $_POST = $formData->steamProperties;
+    $_POST['Enter'] = 'Enter';
+}
+//Load Field Data for GET if detected
+if (isset($_GET['Pressure'])){
+    $_POST = $_GET;
+    $_POST['Enter'] = 'Enter';    
+}
+
+//Clear Steam Property List if Requested
+if (isset($_GET['clear']) and $_GET['clear']=='List') $steamPropertyList->steamProps = array();
+
+//Calculator steam properties if data entered and form valid
+if (isset($_POST['Enter'])) {
+    if ($formValid = $steamForm->isValid($_POST) ){
+        $formData->steamProperties = $steamForm->getValues();
+        $steamObject = $steamForm->getSteamObject();
+        
+        //Save Properties
+        if (is_array($steamPropertyList->steamProps) ){
+            array_unshift($steamPropertyList->steamProps, $steamObject);
+        }else{
+            $steamPropertyList->steamProps = array($steamObject);
+        }
+        //Limit List to 20
+        if (count($steamPropertyList->steamProps)>20) array_pop ($steamPropertyList->steamProps);
+        $steamObjectDisplay = new Steam_ObjectDisplay($steamObject);
+    }
+}else{
+    //Clear Saved Form Data if none submitted
+    unset($formData->steamProperties);
+}
+?>
+
+<script>
+    $(document).ready(function() {               
+        $('#examplesA').hide();             
+        $('#examplesHint').show();         
+        
+        $('#exampleTable').mouseover(function(){ $('#examplesA').show();$('#examplesHint').hide(); });
+        $('#exampleTable').mouseout(function(){ $('#examplesA').hide(); $('#examplesHint').show();});
+            
+        <?php echo $steamForm->jqueryAdd(); ?>       
+    });
+</script>
+
+<div style="position: relative; ">
+    <div>
+        <form method="POST" action="<?php echo $linkLocation;?>">        
+            <table class='data'>
+                <?php echo $steamForm->displaySteamFields(); ?>
+                <tr>
+                    <td><span style="font-style:italic; color: grey;">* <?php echo $this->translate('Required');?></span></td>
+                    <td style="text-align: center;"><?php echo $steamForm->Enter->renderViewhelper();?></td>
+                </tr> 
+            </table>
+        </form>
+        <?php echo $this->partial('/index/partials/dataFieldHint.phtml'); ?>
+        <?php 
+        if (isset($_GET['random']) and isset($examples[$_GET['random']])) 
+            echo "<span style='font-style: italic; color: darkblue;'>**".$this->translate("Example").": ".$this->translate($examples[$_GET['random']])."</span><BR><BR>"; ?>    
+        <table class="data" id='exampleTable'>
+            <tr>
+                <th rowspan="2" style="vertical-align: middle;"><?php echo $this->translate('Examples'); ?>:</th>
+                <td id="examplesHint" style="color: grey; font-style: italic;"><?php echo $this->translate('Mouse Over'); ?></td>
+            </tr><tr id='examplesA' style="background-color: white;z-index: 30;">
+                <?php foreach($examples as $key => $label): ?>
+                <td><a href="<?php echo $linkLocation;?>?random=<?php echo $key;?>"><?php echo $this->translate($label);?></a></td>
+                <?php endforeach;?>
+            </tr>
+        </table>        
+    </div>
+</div>
+
+<?php 
+if ($formValid) {?>
+    <br>
+    <div style="float: left; width: 300px;">
+        <h3><?php echo $this->translate('Steam Properties');?></h3>
+        <?php echo $steamObjectDisplay->displaySteamObjectTable(); ?>
+    </div>
+    <div style="float: left;">
+        <h3><?php echo $this->translate('Temperature-Entropy Diagram');?></h3>
+        <?php echo "<img src='diagramts?p={$mS->localize($steamObject->pressure,'pressure')}&amp;s={$mS->localize($steamObject->specificEntropy,'specificEntropy')}' style=\"border: 1px solid black\" alt='Temperature-Entropy Diagram'>"; ?>
+    </div>
+    <br style='clear: both;'><br>
+<?php }
+
+//If property list display list
+if (count($steamPropertyList->steamProps)>0){ ?>   
+    <br><h3><?php echo $this->translate('Recent Properties (max 20)');?> - [<a href='propertiesDownload'><?php echo $this->translate('download');?></a>] - [<a href='<?php echo $linkLocation;?>?clear=List' onclick="return confirm('<?php echo $this->translate('Clear All Properties?');?>')"><?php echo $this->translate('clear');?></a>]</h3>      
+    <?php
+    $recent = new Steam_ObjectDisplay($steamPropertyList->steamProps);
+    echo $recent->displaySteamObjectTableFlat();  
+}

@@ -1,0 +1,19 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Steam Model
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+echo $this->partial('index/partials/modelMenu.phtml', array('action' => 'adjustedEnergy'));
+?>
+<h2><?php echo $this->translator->_('Adjusted Energy Flows');?></h2>
+<div style="position: relative;  float: left; width: 700px; height: 450px; font-size: .75em">
+    <?php echo Steam_Model_Sankey::addSankeyText($this->sMc->adjustedModels); ?>
+    <img src="adjustedSankey" alt="Adjusted Model Sankey">
+</div>

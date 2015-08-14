@@ -1,0 +1,210 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Equipment Calculators
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$titles = Steam_Support::descriptions('Equipment', 'heatloss');
+$linkLocation = 'equipHeatloss';
+?>
+<h1><?php echo $this->translator->_($titles[0]." Calculator");?>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="tutorials?vid=heatloss"><?php echo $this->translator->_("watch tutorial");?></a></span>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="SSMTGuide.pdf#page=23"><?php echo $this->translator->_("view guide");?></a></span>
+</h1>
+<h3><?php echo $this->translator->_($titles[1]);?></h3><BR>
+    
+<?php
+$mS = Steam_MeasurementSystem::getInstance();
+$heatLossForm = new Steam_Forms_HeatLoss();
+$formValid = false;
+//Load Saved Form Data
+$formData = new Zend_Session_Namespace('formData');
+
+//Populate, validate, or reset form
+if (isset($_GET['reset'])) unset($formData->heatloss);
+$examples = Steam_DataGenerator::examples('heatloss');
+if (isset($_GET['random']) and isset($examples[$_GET['random']])) $_POST = Steam_DataGenerator::heatloss($_GET['random']);
+if ( !isset($_POST['Enter']) and isset($formData->heatloss) ){
+    $_POST = $formData->heatloss->unload();
+    $_POST['Enter'] = 'Enter';
+}
+if (isset($_POST['Enter'])){
+    if ($formValid = $heatLossForm->isValid($_POST) ){
+        $formData->heatloss = new Steam_DTO('heatloss', $heatLossForm->getValues() );
+    }
+}
+?>    
+
+<script type="text/javascript">
+    $(document).ready(function() {               
+        $('#examplesA').hide();             
+        $('#examplesHint').show();         
+        
+        $('#exampleTable').mouseover(function(){ $('#examplesA').show();$('#examplesHint').hide(); });
+        $('#exampleTable').mouseout(function(){ $('#examplesA').hide(); $('#examplesHint').show();});
+
+        
+        <?php echo Steam_StdForm::hintDetails(array(
+                          'type' => 'massflow',
+                          'fieldID' => "massFlow",
+                          'title' => "Mass Flow",                        
+                          'text' => "Mass flow of steam (or liquid).",                        
+                      ));   
+        echo Steam_StdForm::hintDetails(array(
+                          'type' => 'heatloss',
+                          'fieldID' => "heatLossPercent",
+                          'title' => "Heat Loss Percent",
+                          'text' => "Percent of heat lost between inlet and outlet. ",
+                      ));   
+        echo $heatLossForm->jqueryAdd(); ?>      
+    });
+</script>
+
+<div style="position: relative; height: 265px;">
+    <div style="position: absolute; top: 0px; left: 0px;"> 
+        <form method="POST" action="<?php echo $linkLocation;?>">
+            <table class='data'>
+                <tr><td colspan="2" style="text-align:center;"><h3><?php echo $this->translator->_('Inlet');?></h3></td></tr>
+                <?php echo $heatLossForm->displaySteamFields('Inlet'); ?>
+                <tr>
+                    <th><?php echo $this->translator->_('Mass Flow');?> *</th><td><?php echo $heatLossForm->massFlow->renderViewhelper()." ".$mS->label('massflow');?></td>
+                        <?php if ($errors = $heatLossForm->massFlow->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr><td colspan="2"></td></tr>
+                <tr>
+                    <th><?php echo $this->translator->_('Percent Heat Loss');?> *</th><td><?php echo $heatLossForm->heatLossPercent->renderViewhelper()." ".$mS->label('%');?></td>
+                        <?php if ($errors = $heatLossForm->heatLossPercent->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr><td><span style="font-style:italic; color: grey;">* <?php echo $this->translator->_('Required');?></span></td><td style="text-align: center;"><?php echo $heatLossForm->Enter->renderViewhelper();?>
+                    <?php if ($formValid) echo "<span style='font-size: 1em; margin-left: 10px;'>[<a href=\"{$linkLocation}?reset=1\">{$this->translator->_('reset')}</a>]</span>";?></td></tr>
+            </table>
+        </form>
+        <?php echo $this->partial('/index/partials/dataFieldHint.phtml'); ?>
+        <?php 
+        if (isset($_GET['random']) and isset($examples[$_GET['random']])) 
+            echo "<span style='font-style: italic; color: darkblue;'>**".$this->translate("Example").": ".$this->translate($examples[$_GET['random']])."</span><BR><BR>"; ?>    
+        <table class="data" id='exampleTable'>
+            <tr>
+                <th rowspan="2" style="vertical-align: middle;"><?php echo $this->translate('Examples'); ?>:</th>
+                <td id="examplesHint" style="color: grey; font-style: italic;"><?php echo $this->translate('Mouse Over'); ?></td>
+            </tr><tr id='examplesA' style="background-color: white;z-index: 30;">
+                <?php foreach($examples as $key => $label): ?>
+                <td><a href="<?php echo $linkLocation;?>?random=<?php echo $key;?>"><?php echo $this->translate($label);?></a></td>
+                <?php endforeach;?>
+            </tr>
+        </table>
+        <div style="width: 280px">
+            <h3 style><?php echo $this->translator->_('Calculation Details and Assumptions below');?></h3>
+        </div>
+    </div>
+    <?php
+    if ($formValid){
+        $steamObject = $heatLossForm->getSteamObject('Inlet');
+        $steamObject->setMassFlow($mS->standardize($heatLossForm->getValue('massFlow'),'massflow'));
+        $heatlossObject = new Steam_Equipment_HeatLoss(
+                $steamObject, 
+                array('percent' => $heatLossForm->getValue('heatLossPercent')/100)
+                        );
+    ?>
+
+    <div style="float: right; width: 470px;  margin-right: 20px;">
+        <div style="position: relative;">  
+            <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+            'steamObject' => $heatlossObject->inletSteam, 'steamName' => 'Inlet Steam'));?>
+        </div>
+
+        <div style="position: relative; left: 50px; height: 108px; top: -12px;">    
+            <img src="images/pipes/PipeBlueVert.gif" style="position: absolute; top: 0px; left: 65px; width: 20px; height: 120px;" alt="pipe">
+            <div style="position: absolute; left: 62px; top: 43px;  height: 12px; width: 24px; border: 1px black solid;">
+                <div  style="height: 12px; width: 24px;background-color: silver; opacity: .5;"></div>
+            </div>
+
+            <img src='images/arrows/ArrowDown.gif' style='position: absolute; left: 88px; top: 38px;  opacity: 1;' alt="arrow">        
+
+            <div style="position: absolute; left: 103px; top: 24px;">            
+                <?php echo $heatlossObject->displayHeatLoss(); ?>            
+            </div>
+        </div>
+
+        <div style="position: relative;">  
+            <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+            'steamObject' => $heatlossObject->outletSteam, 'steamName' => 'Outlet Steam')); ?>    
+        </div>         
+    </div>
+    <?php }?>
+</div>
+<br style='clear: both;'>
+
+<h2><?php echo $this->translator->_('Calculation Details');?></h2>
+<h3><?php echo $this->translator->_('Step 1: Determine Inlet Properties');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Inlet Pressure '.
+    'and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality). The Specific Enthalpy is then multiplied by the Mass Flow to get the Energy Flow');?>:</span>
+<?php if ($formValid){ 
+    $steamObject = $heatlossObject->inletSteam; 
+    $secParaDets = Steam_StdForm::secondParameterDetails($heatLossForm->getValue('InletSecondParameter')); ?>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($steamObject->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_($secParaDets[0]);?></var> = <?php echo $mS->$secParaDets[2]($steamObject->$secParaDets[1]);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($steamObject, $heatLossForm->getValue('InletSecondParameter'));?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?></span></li>     
+</ul>    
+<?php } ?>
+<ul>    
+    <li><var><?php echo $this->translator->_('Inlet Energy Flow');?></var> = <var><?php echo $this->translator->_('Specific Enthalpy');?></var> * <var><?php echo $this->translator->_('Mass Flow');?></var>
+    <?php if ($formValid){ ?>
+        <br>[ <span class="equationValues"><var><?php echo $this->translator->_('Inlet Energy Flow');?></var> = <?php echo $mS->displayEnergyflowLabeled($steamObject->energyFlow);?> 
+        = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?> * <?php echo $mS->displayMassflowLabeled($steamObject->massFlow);?></span> ]
+    <?php } ?></li>
+</ul>
+
+
+
+<h3><?php echo $this->translator->_('Step 2: Determine Outlet Energy Flow after Heat Loss');?></h3>
+
+<ul>
+    <li><var><?php echo $this->translator->_('Outlet Energy Flow');?></var> = <var><?php echo $this->translator->_('Inlet Energy Flow');?></var> * ( 1 - <var><?php echo $this->translator->_('Heat Loss');?> (%)</var> )
+    <?php if ($formValid){ ?>              
+        <BR>[ <var><?php echo $this->translator->_('Outlet Energy Flow');?></var> = <span class="equationValues"> <?php echo $mS->displayEnergyflowLabeled($heatlossObject->outletSteam->energyFlow); ?> = 
+        <?php echo $mS->displayEnergyflowLabeled($heatlossObject->inletSteam->energyFlow); ?> * ( 1 - <?php echo round($heatlossObject->energyLossPercent,4); ?> ) </span>]
+    <?php } ?>
+    </li>
+</ul>
+
+<h3><?php echo $this->translator->_('Step 3: Determine Outlet Properties');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('The outlet specific enthalpy is determined from energy and mass flows');?>:</span>
+<ol>
+    <li><var><?php echo $this->translator->_('Outlet Mass Flow');?></var> = <var><?php echo $this->translator->_('Inlet Mass Flow');?></var></li>
+    <li><var><?php echo $this->translator->_('Outlet Energy Flow');?></var> = <var><?php echo $this->translator->_('Outlet Mass Flow');?></var> * <var><?php echo $this->translator->_('Outlet Specific Enthalpy');?></var></li>
+    <li><var><?php echo $this->translator->_('Outlet Specific Enthalpy');?></var> = <var><?php echo $this->translator->_('Outlet Energy Flow');?></var> / <var><?php echo $this->translator->_('Inlet Mass Flow');?></var>
+    <?php if ($formValid){ ?>              
+        <BR>[ <var><?php echo $this->translator->_('Outlet Specific Enthalpy');?></var> = <span class="equationValues"> <?php echo $mS->displaySpecificEnthalpyLabeled($heatlossObject->outletSteam->specificEnthalpy); ?> = 
+        <?php echo $mS->displayEnergyflowLabeled($heatlossObject->outletSteam->energyFlow); ?> / <?php echo $mS->displayMassflowLabeled($heatlossObject->outletSteam->massFlow); ?>  </span> ]
+    <?php } ?>
+    </li>
+</ol>
+
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Pressure and Specific Enthalpy');?>:</span>
+<?php if ($formValid){ ?>
+<ul>    
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($heatlossObject->outletSteam->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($heatlossObject->outletSteam->specificEnthalpy);?></span></li>
+    <li><a href="<?php echo Steam_StdForm::propLink($heatlossObject->outletSteam, $heatLossForm->getValue('InletSecondParameter'));?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Temperature');?></var> = <?php echo $mS->displayTemperatureLabeled($heatlossObject->outletSteam->temperature);?></span></li>
+</ul>
+<?php }else{ echo "<BR>";}  ?>
+
+
+<h2><?php echo $this->translator->_('Assumptions');?></h2>
+<ul>
+    <li><?php echo $this->translator->_('Inlet Mass Flow equals Outlet Mass Flow.');?></li>
+    <li><?php echo $this->translator->_('Baseline (0 Energy Flow) is set at the triple point for water.');?></li>
+    <li><?php echo $this->translator->_('% Heat Loss is relative to the Baseline.');?></li>
+</ul>

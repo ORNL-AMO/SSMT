@@ -1,0 +1,231 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Steam Model
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$mS = new Steam_MeasurementSystem();
+$projectForm = new Steam_Model_ProjectsForm($this->sMc->baseModel);
+$projectDetails = new Steam_Model_Projects($this->sMc->baseModel);
+$formValid = false;
+
+if (isset($_POST['Enter']) ){
+    //Open closed Categories if Projects still selected    
+    $catCount = 0;
+    foreach(Steam_Model_Projects::listed() as $cat => $projects){
+        $cc=0;         
+        foreach($projects[1] as $projectKey => $projectTitle){             
+            if (isset($_POST[$projectKey]) and $_POST[$projectKey]==1) $cc++;
+        }
+        if ($cc==0) $_POST[$cat]=0;
+        if ($cc>0) {$_POST[$cat]=1; $catCount++;}
+    }    
+    
+    //Validate Form and Generate Adjusted Model if Valid
+    if ($projectForm->isValid($_POST)){
+        if ( $catCount>0 ){
+            $this->sMc->saveProjects( new Steam_DTO('baseModel', $projectForm->getValues()) );
+            $this->sMc->setStatus('Adjusted Model Generated Successfully');
+            $formValid = true;
+        }else{
+            $this->sMc->setStatus('Adjusted Model NOT Generated: No Projects Selected',true);
+        }
+    }else{
+        $this->sMc->setStatus('Adjusted Model NOT Generated: See Errors Below',true);
+    }   
+    $projectDetails = new Steam_Model_Projects($this->sMc->baseModel, $_POST);   
+}else{
+    if ( $this->sMc->adjustedLoaded ) {
+        $projectForm->isValid($this->sMc->adjustedDTO->unload());
+        $projectDetails = new Steam_Model_Projects($this->sMc->baseModel, $this->sMc->adjustedDTO->unload());
+    }
+}
+echo $this->partial('index/partials/modelMenu.phtml', array('action' => 'adjustedModel'));
+echo $this->sMc->status(); 
+?>
+
+<script>
+    $(document).ready(function() {
+        $("#hideUnselected").change(function() { checkUnused() });
+        function checkUnused(){
+            if ($("#hideUnselected").is(":checked")){                                                
+                <?php foreach($projectDetails->projects as $cat => $projects) {foreach($projects[1] as $projectNum => $projectName): ?>          
+                    if (!$("#<?php echo $projectNum; ?>").is(":checked")){
+                        $("#projectTitle<?php echo $projectNum; ?>").hide();
+
+                        $("#<?php echo $cat; ?>Arrow").attr('src','images/arrowClosed.gif');
+                    }
+                <?php endforeach; }?>
+            }else{
+                $("tr[id^='projectTitle']").show();
+            }
+        } 
+    
+        <?php foreach($projectDetails->projects as $cat => $projects) { ?>        
+            function checkCat<?php echo $cat; ?>() {
+                if ($("#<?php echo $cat; ?>").is(":checked")){                
+                    $("#<?php echo $cat; ?>ProjectList").fadeIn();
+                    $("#<?php echo $cat; ?>Arrow").attr('src','images/arrowOpen.gif');
+                    $("#<?php echo $cat.'row'; ?>").attr('style','color: black; font-size: 1.125em; font-weight: bold; vertical-align: middle;');
+                    <?php foreach($projects[1] as $projectNum => $projectName): ?>
+                        checkProject<?php echo $projectNum; ?>();
+                    <?php endforeach; ?>
+                }else{                
+                    $("#<?php echo $cat; ?>Arrow").attr('src','images/arrowClosed.gif');
+                    $("#<?php echo $cat.'row'; ?>").attr('style','color: grey; font-size: 1.125em; font-weight: bold; vertical-align: middle;');
+                    $("#<?php echo $cat; ?>ProjectList").hide();
+                    <?php foreach($projects[1] as $projectNum => $projectName): ?>
+                        $("#project<?php echo $projectNum; ?>details").hide();
+                        $("#<?php echo $projectNum.'row'; ?>").attr('style','color: grey;');
+                    <?php endforeach; ?>
+                }
+            }
+            checkCat<?php echo $cat; ?>();       
+            $("#<?php echo $cat; ?>").change(function() { checkCat<?php echo $cat; ?>() });
+        <?php }  ?>          
+
+        <?php foreach($projectDetails->projects as $cat => $projects) {foreach($projects[1] as $projectNum => $projectName): ?>        
+            function checkProject<?php echo $projectNum; ?>() {
+                if ($("#<?php echo $projectNum; ?>").is(":checked")){
+                    $("#project<?php echo $projectNum; ?>details").fadeIn();
+                    $("#<?php echo $projectNum.'row'; ?>").attr('style','color: black;');
+                }else{
+                    $("#project<?php echo $projectNum; ?>details").hide();
+                    $("#<?php echo $projectNum.'row'; ?>").attr('style','color: grey;');
+                }
+            }
+            checkProject<?php echo $projectNum; ?>();       
+            $("#<?php echo $projectNum; ?>").change(function() { checkProject<?php echo $projectNum; ?>() });
+        <?php endforeach; } ?>     
+                       
+        $("#Proj_steamDemand").change(function(){
+            if ($("#Proj_steamDemand:checked").val()==1){
+                $("#Proj_energyDemand").attr('checked', false);
+                checkProjectProj_energyDemand();
+            }
+        });
+
+        $("#Proj_energyDemand").change(function(){
+            if ($("#Proj_energyDemand:checked").val()==1){
+                $("#Proj_steamDemand").attr('checked', false);
+                checkProjectProj_steamDemand();
+            }
+        });
+                
+        <?php
+        // Turn Turbines on and off
+        foreach(Steam_Support::steamTurbineCodes() as $turbineName){?>
+                
+            turbine<?php echo $turbineName; ?>OnOff();
+            $("#turbine<?php echo $turbineName; ?>On").change(function(){
+               turbine<?php echo $turbineName; ?>OnOff();
+            });
+
+            function turbine<?php echo $turbineName; ?>OnOff(){
+               if ($("#turbine<?php echo $turbineName; ?>On:checked").val()==1){               
+                   $("#turbine<?php echo $turbineName; ?>Details").fadeIn('fast');
+               }else{
+                   $("#turbine<?php echo $turbineName; ?>Details").hide();
+               }
+            }            
+
+            $("#turbine<?php echo $turbineName; ?>Method").change(function(){
+               turbine<?php echo $turbineName; ?>ChangeMethod();
+            });
+            turbine<?php echo $turbineName; ?>ChangeMethod();
+            function turbine<?php echo $turbineName; ?>ChangeMethod(){
+
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'balanceHeader'){
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedPower").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinPower").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxPower").hide();
+                }
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'fixedFlow'){
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedFlow").show();
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedPower").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinPower").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxPower").hide();
+                }
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'fixedPower'){
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedPower").show();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinPower").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxPower").hide();
+                }
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'flowRange'){
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedPower").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinFlow").show();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxFlow").show();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinPower").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxPower").hide();
+                }
+                if ($('#turbine<?php echo $turbineName; ?>Method').val() == 'powerRange'){
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>FixedPower").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxFlow").hide();
+                    $("#sf_turbine<?php echo $turbineName; ?>MinPower").show();
+                    $("#sf_turbine<?php echo $turbineName; ?>MaxPower").show();
+                }
+            }
+        <?php }
+
+        echo $this->partial('/index/partials/modelHintJS.phtml');     
+        echo $projectForm->jqueryAdd()?>
+
+    });
+</script>
+
+<BR>
+<?php echo $this->partial('/index/partials/dataFieldHint.phtml'); ?>
+
+<h2><?php echo $this->translator->_('Select Potential Adjustments/Projects');?></h2>
+<p><?php echo $this->translator->_("Unless adjusted Steam Demands are set, the Adjusted Model's process energy usage will be set to match the Base Model, ".
+    "as it is assumed that all processes will still required the same amount of energy.");?></p>
+
+<form action="" method="POST">
+    <table class="data">
+        <?php foreach($projectDetails->projects  as $category => $projects): ?>
+        <tr>
+            <td id="<?php echo $category;?>row" colspan="3" style="font-size: 1.125em; font-weight: bold; vertical-align: middle;">                       
+                <?php echo $projectForm->$category->renderViewHelper();?>
+                <img id="<?php echo $category;?>Arrow" src="images/arrowClosed.gif" style="margin: 0px; vertical-align: middle;">
+                <?php echo $this->translator->_($projects[0]); ?>
+            </td>
+        </tr>
+        <tr id="<?php echo $category;?>ProjectList">
+            <td>
+                <table class="data" style="margin-left: 20px;">
+                    <?php foreach($projects[1] as $projectNum => $projectName): ?>        
+                        <tr id='projectTitle<?php echo $projectNum; ?>'>
+                            <th id="<?php echo $projectNum;?>row" style="text-align: left;" colspan="3">
+                                <?php echo $projectForm->$projectNum->renderViewHelper();?>
+                                <?php echo $this->translator->_($projectName); ?>
+                            </th>
+                        </tr>
+                        <tr id='project<?php echo $projectNum; ?>details' style="padding-bottom: 10px;">
+                            <td style="width: 10px;"></td>
+                            <td><?php echo $projectDetails->projectContent[$projectNum]; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+    <?php echo $projectForm->Enter->renderViewHelper();?>
+</form>

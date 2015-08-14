@@ -1,0 +1,44 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+
+$this->translator = Zend_Registry::get('Zend_Translate');   
+?>
+<div id="fieldDetails">
+    <div  id="fieldDetailsMain" style="position: absolute; top: -10px; left: 325px; width: 200px; border: 3px solid #AAAAFF; background-color: white; z-index: 30;" >
+        <table class="data" style="width: 200px; margin-bottom: 0px;">
+            <tr>
+                <th style="text-align: center; font-size: 1.25em;" id="fieldDetailsTitle" colspan="2"></th>
+            </tr>
+            <tr>
+                <td style="text-align: center; font-weight: bold;" id="fieldDetailsUnit" colspan="2"></td>
+            </tr>
+            
+            <tr id="fieldDetailsTextRow">
+                <td id="fieldDetailsText" colspan="2"></td>
+            </tr>
+
+            <tr>
+                <th style="text-align: center;" colspan="2"><?php echo $this->translator->_('Allowed Range / Limits');?></th>
+            </tr>
+            <tr>
+                <th style="width: 60px;"><?php echo $this->translator->_('Minimum');?></th><td id="fieldDetailsMin"></td>
+            </tr>
+            <tr>
+                <th><?php echo $this->translator->_('Maximum');?></th><td id="fieldDetailsMax"></td>
+            </tr>
+            <tr>
+                <td style="text-align: center;" colspan="2" id="fieldDetailsRange"></td>
+            </tr>
+        </table>
+    </div>
+    <div id="fieldDetailsShadow" style="position: absolute; top: -5px; left: 331px; width: 204px; height: 110px;  background-color: grey; z-index: 20;">
+
+    </div>
+</div>

@@ -1,0 +1,27 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+
+echo $this->partial('index/partials/modelMenu.phtml', array('action' => 'baseDiagram') );
+?>
+<h2 style="display: inline"><?php echo $this->translator->_('Base Model: Diagram');?></h2>
+<p style="display: inline; margin-left: 10px;"><?php echo $this->translator->_('Click-on and mouse-over equipment and components for more details.');?></p>
+<br><br>
+
+<div id="modelMaster" style="position: relative; height: <?php echo $this->sMc->baseModel->headerCount==3?650:475;?>px; display: none;">
+    <div style="position: absolute; top: 0px; left: 0px;  width: 800px; height: 800px;"> 
+        <?php $tmp = new Steam_Model_Render($this->sMc->baseModel);?>            
+    </div>
+</div>
+<div style="margin: 10px; float: left;">    
+    <?php echo $this->partial('/index/partials/costSummary.phtml', array('model' => $this->sMc->baseModel)); ?>    
+</div>
+<div style="margin: 10px; margin-left: 20px; float: left;">    
+    <?php echo $this->partial('/index/partials/marginalCosts.phtml', array('model' => $this->sMc->baseModel)); ?>    
+</div>

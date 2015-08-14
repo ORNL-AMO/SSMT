@@ -1,0 +1,25 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+
+echo $this->partial('index/partials/modelMenu.phtml', array('action' => 'export') );
+?>
+
+<h2><?php echo $this->translator->_('Export Model to POT');?></h2>
+<p><?php echo $this->translator->_('The export option is limited to English using imperial units.');?></p>
+
+<h3>Instructions for Export</h3>
+<ol>
+    <li>Generate downloadable file by hovering your mouse over “[download],” clicking “Export to AMO tracker,” and saving the file on your computer.</li>
+    <li>Log on to the eCenter, go to the Project Opportunities Tracker, click “Import”, and choose the file that you just saved</li>
+    <li>You will now be able to sort, edit, and save data from the Steam System modeler in the Project Opportunities Tracker</li>    
+</ol>
+<br>
+<p><a href="downloadXML" style="border: 1px black solid; background-color: #DDD; padding: 6px; font-weight: bold; margin: 13px;">Generate Export File</a></p>
+<p>Note: Individual project savings are evaluated individually. The combined savings will be less than the total individual projects as they potentially share the same savings.</p>

@@ -1,0 +1,74 @@
+div#program_highlights div {margin-bottom:1.5em;}
+
+/* Adjust top nav widths as needed */
+
+/*
+#topnav li#nav_home, #topnav li#nav_home a {min-width: 80px; width:80px;}
+#topnav li#nav_about, #topnav li#nav_about a {min-width: 160px; width:160px;}
+#topnav li#nav_research, #topnav li#nav_research a {min-width: 150px; width:150px;}
+#topnav li#nav_financial, #topnav li#nav_financial a {min-width: 90px; width:90px;}
+#topnav li#nav_info, #topnav li#nav_info a {min-width: 150px; width:150px;}
+#topnav li#nav_news, #topnav li#nav_news a {min-width: 100px; width:100px;}
+#topnav li#nav_events, #topnav li#nav_events a {min-width: 100px; width:100px;}
+
+*/
+
+/* Adjust space between top nav as needed */
+
+/* 
+#topnav li{
+	margin-right:45px;
+}
+
+*/
+    ul.errors {
+        color: red;
+        margin: 0px;
+        margin-left: 12px;
+    }
+    
+    
+
+var {
+    font-family: ARIAL;
+    color: #555;
+    font-weight: bold;
+    font-size: .875em;
+}
+
+span.equationValues {
+    
+    color: blue;
+}
+
+span.equationDescriptions {
+    display: block;
+    font-weight: .875em;
+    margin-left: 10px;
+}
+
+table th.pf_projectOld{
+    background-color: #eeeeee;
+    vertical-align: middle;
+    width: 160px;
+    padding: 7px;
+}
+
+table td.pf_baseVal{
+    width: 80px;
+    vertical-align: middle;
+    text-align: center;
+    border-right: 2px blue solid;
+}
+
+table th.pf_projectNew{
+    background-color: #eeeeee;
+    vertical-align: middle;
+    width: 150px;
+}
+
+table td.pf_adjustedVal{
+    width: 110px;
+    vertical-align: middle;
+}
+                

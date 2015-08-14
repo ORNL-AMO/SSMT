@@ -1,0 +1,140 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Steam Model
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+global $CURRENCY_SYMBOL;
+$mS = Steam_MeasurementSystem::getInstance();
+$SMC = $this->steamModelCommunicator; 
+echo $this->partial('index/partials/modelMenu.phtml', array('action' => 'summary'));
+?>
+
+<h2><?php echo $this->translator->_('Base Model vs Adjusted Model');?></h2>
+<table class="data">
+    <tr>
+        <th><?php echo $this->translator->_('Cost Summary');?></th>
+        <th><?php echo $this->translator->_('Base Model');?></th>
+        <th><?php echo $this->translator->_('Adjusted Model');?></th>
+        <th colspan="2"><?php echo $this->translator->_('Reduction');?></th>
+    </tr>
+    <tr>
+        <td></td>
+        <td class="c" style="font-size: .875em; color: grey; text-align: center;"><?php echo $CURRENCY_SYMBOL;?>'000s/yr</td>
+        <td class="c" style="font-size: .875em; color: grey; text-align: center;"><?php echo $CURRENCY_SYMBOL;?>'000s/yr</td>
+        <td class="c" style="font-size: .875em; color: grey; text-align: center;"><?php echo $CURRENCY_SYMBOL;?>'000s/yr</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Power Cost');?></td>
+        <?php
+        $tmpBase = $SMC->baseModel->sitePowerCost*$SMC->baseModel->newSitePowerImport*$SMC->baseModel->operatingHours/1000;
+        $tmpProject = $SMC->adjustedModels->sitePowerCost*$SMC->adjustedModels->newSitePowerImport*$SMC->adjustedModels->operatingHours/1000;
+        ?>        
+        <td class="c"><?php echo $CURRENCY_SYMBOL." ".number_format($tmpBase); ?></td>
+        <td class="c"><?php echo $CURRENCY_SYMBOL." ".number_format($tmpProject); ?></td>
+        <?php echo Steam_Support::highlightDifference($tmpBase, $tmpProject, 'Cost'); ?>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Fuel Cost');?></td>
+        <td class="c"><?php echo $CURRENCY_SYMBOL." ".number_format($SMC->baseModel->boilerTotalFuelCost/1000); ?></td>
+        <td class="c"><?php echo $CURRENCY_SYMBOL." ".number_format($SMC->adjustedModels->boilerTotalFuelCost/1000); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->boilerTotalFuelCost/1000, $SMC->adjustedModels->boilerTotalFuelCost/1000); ?>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Make-Up Water Cost');?></td>
+        <td class="c"><?php echo $CURRENCY_SYMBOL." ".number_format($SMC->baseModel->makeupWaterTotalCost/1000); ?></td>
+        <td class="c"><?php echo $CURRENCY_SYMBOL." ".number_format($SMC->adjustedModels->makeupWaterTotalCost/1000); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->makeupWaterTotalCost/1000, $SMC->adjustedModels->makeupWaterTotalCost/1000); ?>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Total Cost');?></td>
+        <td class="c"><?php echo $CURRENCY_SYMBOL." ".number_format($SMC->baseModel->totalOperatingCosts/1000); ?></td>
+        <td class="c"><?php echo $CURRENCY_SYMBOL." ".number_format($SMC->adjustedModels->totalOperatingCosts/1000); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->totalOperatingCosts/1000, $SMC->adjustedModels->totalOperatingCosts/1000); ?>
+    </tr>
+</table>
+<BR>
+
+<table class="data">
+    <tr>
+        <th><?php echo $this->translator->_('Utility Balance');?></th>
+        <th><?php echo $this->translator->_('Base');?></th>
+        <th><?php echo $this->translator->_('After Projects');?></th>
+        <th colspan="2"><?php echo $this->translator->_('Reduction');?></th>
+        <th><?php echo $this->translator->_('Units');?></th>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Power Generation');?></td>
+        <td class="c"><?php echo $mS->displayPower( $SMC->baseModel->powerGenerated ); ?></td>
+        <td class="c"><?php echo $mS->displayPower( $SMC->adjustedModels->powerGenerated ); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->powerGenerated, $SMC->adjustedModels->powerGenerated, 'Power'); ?>
+        <td><?php echo $mS->label('power');?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Power Import');?></td>
+        <td class="c"><?php echo $mS->displayPower( $SMC->baseModel->newSitePowerImport ); ?></td>
+        <td class="c"><?php echo $mS->displayPower( $SMC->adjustedModels->newSitePowerImport ); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->newSitePowerImport, $SMC->adjustedModels->newSitePowerImport, 'Power'); ?>
+        <td><?php echo $mS->label('power');?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Total Site Demand');?></td>
+        <td class="c"><?php echo $mS->displayPower($SMC->baseModel->newSitePowerImport+$SMC->baseModel->powerGenerated ); ?></td>
+        <td class="c"><?php echo $mS->displayPower($SMC->adjustedModels->newSitePowerImport+$SMC->adjustedModels->powerGenerated ); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->newSitePowerImport+$SMC->baseModel->powerGenerated, $SMC->adjustedModels->newSitePowerImport+$SMC->adjustedModels->powerGenerated, 'Power'); ?>
+        <td><?php echo $mS->label('power');?></td>
+    </tr>
+    <tr><td colspan="6"></td></tr>
+    <tr>
+        <td><?php echo $this->translator->_('Boiler Fuel');?></td>
+        <td class="c"><?php echo $mS->displayEnergyflow($SMC->baseModel->boiler->fuelEnergy ); ?></td>
+        <td class="c"><?php echo $mS->displayEnergyflow($SMC->adjustedModels->boiler->fuelEnergy ); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->boiler->fuelEnergy, $SMC->adjustedModels->boiler->fuelEnergy, 'Energyflow'); ?>       
+        <td><?php echo $mS->label('energyflow');?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Fuel Type');?></td>
+        <td class="c"><?php echo $this->translator->_(Steam_Fuel::fuelNames($SMC->baseModel->fuelType)); ?></td>
+        <td class="c"><?php echo $this->translator->_(Steam_Fuel::fuelNames($SMC->adjustedModels->fuelType)); ?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('CO<sub>2</sub> Emissions');?>*</td>
+        <td class="c"><?php echo number_format($SMC->baseModel->co2Emissions); ?></td>
+        <td class="c"><?php echo number_format($SMC->adjustedModels->co2Emissions); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->co2Emissions, $SMC->adjustedModels->co2Emissions, 'Cost'); ?>       
+        <td><?php echo $mS->label('tons');?></td>
+        
+
+    </tr>
+    <tr><td colspan="6"></td></tr>
+    <tr>
+        <td><?php echo $this->translator->_('Boiler Steam');?></td>
+        <td class="c"><?php echo $mS->displayMassflow($SMC->baseModel->boiler->outletSteam->massFlow ); ?></td>
+        <td class="c"><?php echo $mS->displayMassflow($SMC->adjustedModels->boiler->outletSteam->massFlow ); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->boiler->outletSteam->massFlow, $SMC->adjustedModels->boiler->outletSteam->massFlow, 'Massflow'); ?>  
+        <td><?php echo $mS->label('massflow');?></td>
+    </tr>
+    <tr><td colspan="6"></td></tr>
+    <tr>
+        <td><?php echo $this->translator->_('Make Up Water');?></td>
+        <td class="c"><?php echo $mS->displayVolumeflow($SMC->baseModel->makeupWater->volumeFlow/60 ); ?></td>
+        <td class="c"><?php echo $mS->displayVolumeflow($SMC->adjustedModels->makeupWater->volumeFlow/60 ); ?></td>
+        <?php echo Steam_Support::highlightDifference($SMC->baseModel->makeupWater->volumeFlow/60, $SMC->adjustedModels->makeupWater->volumeFlow/60, 'Volumeflow'); ?>  
+        <td><?php echo $mS->label('volumeflow');?></td>
+    </tr>
+</table>
+<p>*<?php echo $this->translator->_('Source of CO<sub>2</sub> Coefficients');?>: <a href="http://www.eia.gov/oiaf/1605/coefficients.html">http://www.eia.gov/oiaf/1605/coefficients.html</a></p>
+
+
+<BR>
+<?php echo $SMC->adjustedDTO->displayActiveProjects(); ?>
+
+    
+

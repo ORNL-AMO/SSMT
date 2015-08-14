@@ -1,0 +1,47 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+?>
+<?php echo $this->doctype() ?>
+
+<html>
+<head>
+    <link href="itp2011/reset.css" rel="stylesheet" type="text/css">
+    <link href="itp2011/main_green.css" rel="stylesheet" type="text/css">
+    
+    <link href="itp2011/site.css" rel="stylesheet" type="text/css"> <!--make any site specific style changes to this sheet only. -->
+    <link href="itp2011/adapter.css" rel="stylesheet" type="text/css">
+    
+    <?php  
+    $this->headScript()->appendFile('scripts/jquery-1.7.2.min.js')
+            ->appendFile('scripts/jquery-ui-1.8.22.custom.min.js')
+            ->appendFile('http://www.eere.energy.gov/includes/leaving_eere.js')
+            ;
+    echo $this->headScript();
+    ?>
+    <script type="text/javascript">
+     (function() {
+        var so = document.createElement('script'); so.type = 'text/javascript'; so.async = true;
+        so.src = '//www.eere.energy.gov/includes/ga/eere.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(so, s);
+      })();
+    </script>
+    
+    <link href="css/ui-lightness/jquery-ui-1.8.22.custom.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.24/themes/base/jquery-ui.css" type="text/css" media="all" />  
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <?php 
+        $action = Zend_Controller_Front::getInstance()->getRequest()->getActionName();
+        $title = $this->translator->_("Advanced Manufacturing Office: Steam Calculators");
+
+        if ($action<>'index') $title = $this->translator->_('Steam Calculators').": ".$this->translator->_(Steam_Support::BreadCrumb($action, ' '));
+        ?>
+    <title><?php echo $this->translator->_($title);?></title>
+</head>

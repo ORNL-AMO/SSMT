@@ -1,0 +1,80 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+
+global $CURRENCY_SYMBOL; 
+
+$this->mS = Steam_MeasurementSystem::getInstance(); 
+$this->translator = Zend_Registry::get('Zend_Translate');      
+?>
+
+<h2><?php echo $this->translator->_('Cost Summary');?></h2>
+
+<table class="data" style="float: left;">
+    <tr>
+        <th colspan="2"><?php echo $this->translator->_('Power Balance');?></th>
+        <th><?php echo $CURRENCY_SYMBOL;?>'000s/yr</th>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Generation');?></td>
+        <td><?php echo $this->mS->displayPowerLabeled($this->model->powerGenerated);?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Demand');?></td>
+        <td><?php echo $this->mS->displayPowerLabeled($this->model->newSitePowerImport+$this->model->powerGenerated);?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Import');?></td>
+        <td><?php echo $this->mS->displayPowerLabeled($this->model->newSitePowerImport);?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Unit Cost');?></td>
+        <td><?php echo $CURRENCY_SYMBOL.' '.number_format($this->mS->localize($this->model->sitePowerCost,'unitcost.electricity'),4);?> / <?php echo $this->mS->label('electricity');?></td>
+        <td><?php echo $CURRENCY_SYMBOL.' '.number_format($this->model->sitePowerCost*$this->model->newSitePowerImport*$this->model->operatingHours/1000,2);?></td>
+    </tr>
+
+    <tr>
+        <th colspan="2"><?php echo $this->translator->_('Fuel Balance');?></th>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Boiler');?></td>
+        <td><?php echo $this->mS->displayEnergyflowLabeled($this->model->boiler->fuelEnergy);?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Unit Cost');?></td>
+        <td><?php echo $CURRENCY_SYMBOL.' '.number_format($this->mS->localize($this->model->fuelUnitCost,'unitcost.energy'),3);?> / <?php echo $this->mS->label('energy');?></td>
+        <td><?php echo $CURRENCY_SYMBOL.' '.number_format($this->model->boilerTotalFuelCost/1000,2); ?></td>
+    </tr>
+    <tr>
+        <th colspan="2"><?php echo $this->translator->_('Make-Up Water');?></th>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Flow');?></td>
+        <td>
+            <?php echo $this->mS->displayVolumeflow($this->model->makeupWater->volumeFlow); ?> <?php echo $this->mS->label('volumeflow');?><BR>
+            <?php echo $this->mS->displayVolume($this->model->makeupWater->volumeFlow*$this->model->operatingHours); ?> <?php echo $this->mS->label('volume');?>
+        </td>
+    </tr>
+    <tr>
+        <td><?php echo $this->translator->_('Unit Cost');?></td>
+        <td><?php echo $CURRENCY_SYMBOL.' '.number_format($this->mS->localize($this->model->makeupWaterCost,'unitcost.volume'),4); ?>/<?php echo $this->mS->label('volume');?></td>
+        <td><?php echo $CURRENCY_SYMBOL.' '.number_format($this->model->makeupWaterTotalCost/1000,2); ?></td>
+    </tr>
+    <tr>
+        <th colspan="2"><?php echo $this->translator->_('Total Operating Cost');?></th>
+        <td>
+            <?php echo $CURRENCY_SYMBOL.' '.number_format(
+                    $this->model->totalOperatingCosts/1000
+                    ,2);
+            ?>
+        </td>
+    </tr>
+</table>
+
+    

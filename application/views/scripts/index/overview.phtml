@@ -1,0 +1,188 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+
+global $CURRENCY_SYMBOL; 
+$mS = Steam_MeasurementSystem::getInstance();
+echo $this->partial('index/partials/modelMenu.phtml', array('action' => 'modeler', 'modelComm' => $this->sMc));
+echo $this->sMc->status();
+?><BR><?php
+
+if (!$this->sMc->baseLoaded){ 
+    //Base Model Not Loaded ?>
+    <div style="float: right;">
+        <img src="images/modelThumb.gif" alt="Steam Model" style="border: 1px black solid; margin: 30px; margin-right: 140px; margin-top: 60px;">
+    </div>    
+    
+    <h2><?php echo $this->translator->_('Using the Steam System Modeler');?>
+        <span style='position: relative; top: -3px; left: 4px; font-size: .65em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+        ><a href="tutorials?vid=overview"><?php echo $this->translator->_("watch tutorial");?></a></span>
+        <span style='position: relative; top: -3px; left: 4px; font-size: .65em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+        ><a href="SSMTGuide.pdf#page=49"><?php echo $this->translator->_("view guide");?></a></span>
+    </h2>
+    
+    <h3><?php echo $this->translator->_('Step 1');?>: <?php echo $this->translator->_('Generate a Base Model');?></h3>
+    <p><?php echo $this->translator->_('There are 3 ways to generate a Base Model');?>:</p>
+    <ul>
+        <li><?php echo $this->translator->_('Manually enter specific steam system details');?> [<a href='baseModel'><?php echo $this->translator->_('link');?></a>]</li>
+        <li><?php echo $this->translator->_('Load an example [below]');?></li>
+        <li><?php echo $this->translator->_('Reload a previously downloaded model');?> [<a href='modelReload'><?php echo $this->translator->_('link');?></a>]</li>
+    </ul>
+
+    <h3><?php echo $this->translator->_('Step 2');?>: <?php echo $this->translator->_('Generate an Adjusted Model');?></h3>
+    <p><?php echo $this->translator->_('A series of projects and system adjustments may be selected and combined with the Base Model to generate an Adjusted Model.');?></p>
+    
+    <h3><?php echo $this->translator->_('Step 3');?>: <?php echo $this->translator->_('Compare Base Model to Adjusted Model');?></h3>
+    <p><?php echo $this->translator->_('A summary of Base Model vs Adjusted Model metrics will be generated once both a Base Model and Adjusted Model have been created.');?></p>
+    <p><?php echo $this->translator->_('A generated model may also be downloaded as an excel file and re-uploaded later');?>.</p>
+    <BR><BR>
+    
+    <h2><?php echo $this->translator->_('Steam Modeler Examples');?></h2>
+    <p><?php echo $this->translator->_('Click on any of the links below to load the example into the steam modeler');?>:</p>
+    <table class="data">
+        <tr>
+            <th><?php echo $this->translator->_('Base Model');?></th>
+            <th><?php echo $this->translator->_('Optional Adjusted Model');?></th>
+        </tr>
+        <tr>
+            <td style="color: grey; font-style: italic;"><?php echo $this->translator->_('select below to only load Base Model');?></td>
+            <td style="color: grey; font-style: italic;"><?php echo $this->translator->_('select below to load Base Model with Adjusted Model');?></td>
+        </tr>
+        <tr>
+            <td><a href="overview?example=random"><?php echo $this->translator->_('Random');?></a></td>
+            <td><?php echo $this->translator->_('no Adjusted Model');?></td>
+        </tr>
+        <tr>
+            <td style="vertical-align: middle;"><a href="overview?example=SSAT3"><?php echo $this->translator->_('SSAT Default 3 Header Model');?></a></td>
+            <td>
+                <ul style="margin: 0px; margin-left: 20px;">
+                    <li><a href="overview?example=SSAT3.noTurbines"><?php echo $this->translator->_('No Turbines');?></a></li>
+                    <li><a href="overview?example=SSAT3.flashCond"><?php echo $this->translator->_('Flash Condensate');?></a></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="overview?example=SSAT2"><?php echo $this->translator->_('SSAT Default 2 Header Model');?></a></td>
+            <td><?php echo $this->translator->_('no Adjusted Model');?></td>
+        </tr>
+        <tr>
+            <td><a href="overview?example=SSAT1"><?php echo $this->translator->_('SSAT Default 1 Header Model');?></a></td>
+            <td><?php echo $this->translator->_('no Adjusted Model');?></td>
+        </tr>
+    </table>
+
+    <P style="color: red; font-weight: bold;"><?php echo $this->translator->_("Doesn't include steam leaks and trap leaks estimates, set SSAT to 0 (zero) traps and steam leaks.");?><BR>
+    <?php echo $this->translator->_("Doesn't include Condensate Tank Vent or Blowdown Heat Exchangers.");?></P>
+
+<?php }else{  // Base Model Loaded ?>
+    <table class="data">
+        <tr>
+            <td colspan="2"></td>
+            <th style="padding: 4px;"><?php echo $this->translator->_("Steam Generated");?></th>
+            <th><?php echo $this->translator->_("Boiler Fuel Usage");?></th>
+            <th><?php echo $this->translator->_("Boiler Fuel Costs");?></th>
+            <th><?php echo $this->translator->_("Electricity Costs");?></th>
+            <th><?php echo $this->translator->_("Total Operating Costs");?></th>
+        </tr>
+        <tr>
+            <td colspan="1"></td>
+            <th><?php echo $this->translator->_("Options");?></th>
+            <td class="c" style="font-size: .875em; color: grey; text-align: center;"><?php echo $mS->selected['massflow'];?></td>
+            <td class="c" style="font-size: .875em; color: grey; text-align: center;"><?php echo $mS->selected['energy'];?>'000s/yr</td>
+            <td class="c" style="font-size: .875em; color: grey; text-align: center;"><?php echo $CURRENCY_SYMBOL;?>'000s/yr</td>
+            <td class="c" style="font-size: .875em; color: grey; text-align: center;"><?php echo $CURRENCY_SYMBOL;?>'000s/yr</td>
+            <td class="c" style="font-size: .875em; color: grey; text-align: center;"><?php echo $CURRENCY_SYMBOL;?>'000s/yr</td>
+        </tr>
+        <tr>
+            <th style="vertical-align: middle;"><?php echo $this->translator->_("Base Model");?><br>
+            <?php 
+            $tmpBase = $this->sMc->baseModel->sitePowerCost*$mS->localize($this->sMc->baseModel->newSitePowerImport,'power')*$this->sMc->baseModel->operatingHours/1000;
+            ?></th>
+            <td style="vertical-align: middle;">
+                <ul style="margin: 0px; margin-left: 14px;">
+                    <li><a href="baseDiagram"><?php echo $this->translator->_("View Diagram");?></a></li>
+                    <li><a href="baseModel"><?php echo $this->translator->_("Update Model");?></a></li>
+                    <li><a href="steamBalance"><?php echo $this->translator->_("View Steam Balance");?></a></li>
+                    <li><a href="baseEnergy"><?php echo $this->translator->_("View Energy Flow");?></a></li>
+                </ul>
+
+            </td>        
+            <td  style="vertical-align: middle; text-align: center;">
+                <?php echo $mS->displayMassflow($this->sMc->baseModel->boiler->outletSteam->massFlow); ?>
+            </td>        
+            <td  style="vertical-align: middle; text-align: center;">
+                <?php echo $mS->displayEnergy($this->sMc->baseModel->boiler->fuelEnergy*$this->sMc->baseModel->operatingHours/1000); ?>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <?php echo $CURRENCY_SYMBOL." ".number_format($this->sMc->baseModel->boilerTotalFuelCost/1000); ?>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <?php echo $CURRENCY_SYMBOL." ".number_format($tmpBase); ?>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <?php echo $CURRENCY_SYMBOL." ".number_format($this->sMc->baseModel->totalOperatingCosts/1000); ?>
+            </td>
+        </tr>    
+        <tr>
+            <th style="vertical-align: middle;"><?php echo $this->translator->_("Adjusted Model");?></th>
+            <?php if (!$this->sMc->adjustedLoaded){ ?>
+                <td style="vertical-align: middle;"><a href="adjustedModel"><?php echo $this->translator->_("Create Adjusted Model");?></a></td>
+            <?php }else{                    
+                $tmpProject = $this->sMc->adjustedModels->sitePowerCost*$mS->localize($this->sMc->adjustedModels->newSitePowerImport,'power')*$this->sMc->adjustedModels->operatingHours/1000;
+                ?>
+                <td style="vertical-align: middle;">
+                    <ul style="margin: 0px; margin-left: 14px;">
+                        <li><a href="adjustedDiagram"><?php echo $this->translator->_("View Diagram");?></a></li>
+                        <li><a href="adjustedModel"><?php echo $this->translator->_("Update Adjustments");?></a></li>
+                        <li><a href="steamBalance"><?php echo $this->translator->_("View Steam Balance");?></a></li>
+                        <li><a href="adjustedEnergy"><?php echo $this->translator->_("View Energy Flow");?></a></li>
+                    </ul>
+                    </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <?php echo $mS->displayMassflow($this->sMc->adjustedModels->boiler->outletSteam->massFlow).'<BR>';
+                    $value = $this->sMc->adjustedModels->boiler->outletSteam->massFlow-$this->sMc->baseModel->boiler->outletSteam->massFlow;                    
+                    echo Steam_Support::colorValue($value, $mS->displayMassflow($value));?>     
+                </td>        
+                <td style="vertical-align: middle; text-align: center;">
+                    <?php echo $mS->displayEnergy($this->sMc->adjustedModels->boiler->fuelEnergy*$this->sMc->adjustedModels->operatingHours/1000)."<BR>"; 
+                    $value =($this->sMc->adjustedModels->boiler->fuelEnergy*$this->sMc->adjustedModels->operatingHours
+                            -$this->sMc->baseModel->boiler->fuelEnergy*$this->sMc->baseModel->operatingHours)/1000;
+                    echo Steam_Support::colorValue($value, $mS->displayEnergy($value));?>                           
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <?php echo $CURRENCY_SYMBOL." ".number_format($this->sMc->adjustedModels->boilerTotalFuelCost/1000)."<BR>"; 
+                    $value = ($this->sMc->adjustedModels->boilerTotalFuelCost-$this->sMc->baseModel->boilerTotalFuelCost)/1000;
+                    echo Steam_Support::colorValue($value, $CURRENCY_SYMBOL." ".number_format($value));?>                   
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <?php echo $CURRENCY_SYMBOL." ".number_format($tmpProject)."<BR>"; 
+                    $value = $tmpProject-$tmpBase;
+                    echo Steam_Support::colorValue($value, $CURRENCY_SYMBOL." ".number_format($value));?>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <?php echo $CURRENCY_SYMBOL." ".number_format($this->sMc->adjustedModels->totalOperatingCosts/1000)."<BR>"; 
+                    $value = ($this->sMc->adjustedModels->totalOperatingCosts-$this->sMc->baseModel->totalOperatingCosts)/1000;
+                    echo Steam_Support::colorValue($value, $CURRENCY_SYMBOL." ".number_format($value));?>
+                </td>
+            <?php } ?>
+        </tr>
+    </table>
+
+    <?php if ($this->sMc->adjustedLoaded): ?>
+        <form method="POST" action='overview' onsubmit="return confirm('<?php echo $this->translator->_("'Overwrite Base Model with Adjusted Model?");?>')">
+            <input type="submit" name='switchAB' value="<?php echo $this->translator->_("Set Adjusted Model as Base Model");?>">
+        </form>
+    <?php endif; ?>
+    <BR><BR>
+
+    <h2><?php echo $this->translator->_("Steam Modeler Examples");?></h2>
+    <p><?php echo $this->translator->_("Loaded Model must be cleared to view and load examples.");?>
+        <a style="color: darkred;" href="overview?destroyModel=now" onclick="return confirm('<?php echo $this->translator->_("Clear Entire Steam Model?");?>')"> <?php echo $this->translator->_("CLEAR MODEL");?></a>
+    </p>
+<?php } ?>

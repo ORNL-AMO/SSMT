@@ -1,0 +1,6 @@
+#Remove specific development env files
+docs/
+nbproject/
+
+.zfproject.xml
+.noencode

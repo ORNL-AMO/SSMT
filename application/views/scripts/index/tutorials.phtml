@@ -1,0 +1,105 @@
+<?php
+$selected = 'intro';
+
+$vids = array(
+    'intro' => ['Introduction', '1:06', 'xibGrIf0kHQ'],
+    'custom' => ['Customizing Units and Language', '1:10', '_76Ai9aT3hc'],
+    'steam' => ['Steam Property Calculators', '1:38', 'bv_JBvfEo2U'],
+    'boiler' => ['Boiler Calculator', '2:09', 'Ag5pGr2oUqw'],
+    'heatloss' => ['Heat Loss Calculator', '1:05', 'SFc3a0sEalU'],
+    'flash' => ['Flash Tank Calculator', '1:28', 'QdtdUoUbvAE'],
+    'prv' => ['PRV Calculator', '1:48', 'j4XF05uxuIY'],
+    'header' => ['Header Calculator', '1:34', '_11XYgtqT5c'],
+    'deaerator' => ['Deaerator Calculator', '1:48', '1eyv6Zad4Uk'],
+    'turbine' => ['Steam Turbine Calculator', '2:17', 'jpyPp5UeBDg'],
+    'overview' => ['Steam Model Overview', '1:31', 'yf4cWqeJ2bY'],
+    'basemodel' => ['Generating a Base Model', '3:37', '8x6VLdYZbPQ'],
+    'reviewing' => ['Reviewing a Model', '2:17', 'FA8exTZanm0'],
+    'adjusted' => ['Creating an Adjusted Model', '1:37', '8H82q_CjI2M'],
+    'compare' => ['Comparing Adjustments', '0:49', 'pHSH6vxxNag'],
+    'saving' => ['Saving and Reloading', '2:36', 'hc-Q6NQgkUg'],
+);
+
+if (isset($_GET['vid']) and isset($vids[$_GET['vid']]))
+    $selected = $_GET['vid'];
+?>
+<style>
+    #tutorials td:first-child{
+        width: 5px;
+    }
+    #tutorials td:nth-child(2){
+        border-left: 6px solid #FFF;        
+        padding: 1px; 
+        padding-left: 6px;
+        font-size: .95em;
+        border-top: 2px solid white;
+        border-bottom: 2px solid white;
+        background-color: #fafafa; 
+    }
+    #tutorials td:nth-child(3){
+        text-align: center;      
+        width: 35px;
+        padding-right: 5px;   
+        font-weight: bold;
+        font-size: .9em;         
+    }
+    #selected td:nth-child(2){
+        border: 2px solid #666; 
+        border-left: 5px solid #666; 
+        border-right: 0px solid blue;
+        background-color: #ddd; 
+        padding: 2px; 
+        font-weight: bold;
+    }
+    #selected td:nth-child(3){
+        border: 2px solid #666; 
+        border-left: 0px solid #666; 
+        border-right: 0px solid blue;
+        padding-right: 5px;
+        background-color: #eee; 
+
+
+    }
+
+</style>
+
+<h1>SSMT Tutorial Videos</h1>
+
+<div style="float: left; width: 268px; z-index: 100; ">
+    <span style="font-weight: bold; font-style: italic;  display: inline; padding-left: 10px; color: olivedrab;">Also Available: <a href="SSMTGuide.pdf">SSMT Guide (PDF)</a></span>
+    <table id="tutorials" style="width: 270px;  position: relative; top: 27px;">
+        <tr><td colspan="3" style="border-bottom: 1px solid #006021; border-left: 3px solid #006021; padding-left: 5px; font-size: .95em;"><h3>General</h3></td></tr>
+        <tr style="height: 3px;"><td></td></tr>
+<?php foreach ($vids as $key => $details) { ?>
+            <?php if ($key == 'boiler') { ?>        
+                <tr style="height: 5px;"><td></td></tr>
+                <tr><td colspan="3" style="border-bottom: 1px solid #006021; border-left: 3px solid #006021; padding-left: 5px; font-size: .95em;"><h3>Equipment Calculators</h3></td></tr>
+                <tr style="height: 3px;"><td></td></tr>
+    <?php } ?> 
+            <?php if ($key == 'overview') { ?>        
+                <tr style="height: 5px;"><td></td></tr>
+                <tr><td colspan="3" style="border-bottom: 1px solid #006021; border-left: 3px solid #006021; padding-left: 5px; font-size: .95em;"><h3>Steam System Modeler</h3></td></tr>
+                <tr style="height: 3px;"><td></td></tr>
+    <?php } ?>   
+            <tr <?php if ($key == $selected) echo "id='selected'"; ?>><td></td>
+                <td><?php if ($key == $selected) {
+        echo "<img src=\"images/arrowClosed.gif\" style=\"height: 10px; width: 14px;\">";
+    } else {
+        echo " - ";
+    };
+    ?><a href="tutorials?vid=<?php echo $key; ?>"><?php echo $details[0]; ?></a></td>
+                <td><?php echo $details[1]; ?></td>
+            </tr>
+<?php } ?>
+    </table>
+
+</div>
+
+<div style="z-index: 1;">
+    <h3 style="padding-top: 5px;">Now Playing:</h3> <h2><?php echo $vids[$selected][0]; ?> </h2>
+
+    <iframe width="512" height="384" style="border: 2px solid #666; color: blue;" 
+            src="https://www.youtube.com/embed/<?= $vids[$selected][2]; ?>?autoplay=0&rel=0&vq=hd720" 
+            frameborder="0" allowfullscreen></iframe>
+
+</div>

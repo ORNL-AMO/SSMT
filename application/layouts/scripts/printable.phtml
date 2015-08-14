@@ -1,0 +1,31 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+?>
+<?php echo $this->render('amo_head.phtml'); ?>
+<body style="text-align: center;">
+
+
+    <div id="outer" style="width: 800px; margin-right: auto; margin-left: auto;">
+        <div style="text-align: left;">
+        <h3><?php echo $this->translator->_("U.S. Department of Energy - Energy Efficiency and Renewable Energy");?></h3>
+
+        <h4 class="printable"><?php echo $this->translator->_("Advanced Manufacturing Office");?></h4><BR>
+        </div>
+        <div class="grid_7" id="maincontent" style="text-align: left;">
+            <?php echo $this->layout()->content; ?>
+        </div>
+     
+        <div id="footer">
+            <?php echo $this->render('footer.phtml') ?>
+        </div>
+    </div>
+</body>
+</html>
+

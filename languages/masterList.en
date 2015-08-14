@@ -1,0 +1,886 @@
+    The outlet properties are determined using the inlet enthalpy and outlet pressure
+    and Desuperheating Temperature
+    and Quality = 0 (Saturated Liquid). The Specific Enthalpy is then multiplied by the Mass Flow to get the Energy Flow
+    and the Header Specific Enthalpy
+    and the Header Specific Entropy
+    and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality)
+    and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality). The Specific Enthalpy is then multiplied by the Mass Flow to get the Energy Flow
+    as it is assumed that all processes will still required the same amount of energy.
+    the PRV outlet cannot be desuperheated to the set temperature and desuperheating is canceled.
+ Pressure
+ Quality
+ Specific Enthalpy
+ Specific Entropy
+ Temperature
+$ / <span style="font-style: italic; color: grey;">MMBtu</span>
+$ / <span style="font-style: italic; color: grey;">gal</span>
+$ / <span style="font-style: italic; color: grey;">kWh</span>
+% Heat Loss is relative to the Baseline.
+'%value%'  is not a valid number.
+'%value%' is not between '%min%' and '%max%', inclusively
+'Overwrite Base Model with Adjusted Model?
+*May include slight rounding errors.
+1 - Header
+2
+2 - Header
+3
+3 - Header
+4
+5
+6
+7
+8
+9
+<span style="font-style: italic; color: grey;">%</span>
+<span style="font-style: italic; color: grey;">&#xb0;C</span>
+<span style="font-style: italic; color: grey;">&#xb0;F</span>
+<span style="font-style: italic; color: grey;">Celsius °C</span>
+<span style="font-style: italic; color: grey;">Fahrenheit °F</span>
+<span style="font-style: italic; color: grey;">Hours</span>
+<span style="font-style: italic; color: grey;">Kelvin K</span>
+<span style="font-style: italic; color: grey;">MPa (absolute)</span>
+<span style="font-style: italic; color: grey;">bar (gauge)</span>
+<span style="font-style: italic; color: grey;">btu/lbm/R</span>
+<span style="font-style: italic; color: grey;">btu/lbm</span>
+<span style="font-style: italic; color: grey;">kJ/kg/K</span>
+<span style="font-style: italic; color: grey;">kJ/kg</span>
+<span style="font-style: italic; color: grey;">kW</span>
+<span style="font-style: italic; color: grey;">klb/hr</span>
+<span style="font-style: italic; color: grey;">psi (absolute)</span>
+<span style="font-style: italic; color: grey;">psi (gauge)</span>
+<span style="font-style: italic; color: grey;">t/hr</span>
+<span style='font-style: italic'>-Range further limited by associated pressure.</span>
+A PRV is an isenthalpic process, meaning the inlet enthalpy is equal to the outlet enthalpy.
+A device that extracts thermal energy from pressurized steam and uses it to do mechanical work on a rotating output shaft.
+A generated model may also be downloaded as an excel file and re-uploaded later
+A measure of the tendency of a process to be entropically favored, or to proceed in a particular direction.
+A measurement of energy per unit mass.
+A measurement of entropy per unit mass.
+A measurement of the total energy of a thermodynamic system.
+A multi-browser JavaScript library
+A previously downloaded steam model may be reloaded.
+A process that proceeds without any change in enthalpy.
+A process that proceeds without any change in entropy.
+A series of projects and system adjustments may be selected and combined with the Base Model to generate an Adjusted Model.
+A spreadsheet engine capability of reading, writing and creating Excel and OpenXML documents in PHP
+A substance that is at the vapor-liquid equilibrium which occurs at the pressure-dependent boiling point. The liquid and vapor components are individually referred to as Saturated Liquid and Saturated Gas/Vapor. If the substance is entirely one or the other, the individual component term can be used to describe the whole.
+A summary of Base Model vs Adjusted Model metrics will be generated once both a Base Model and Adjusted Model have been created.
+About
+About the Steam Calculators
+Additional Energy Flow Needed
+Additional Info
+Adjust Boiler Operation
+Adjust Condensate Handling
+Adjust Heat Loss Percentage
+Adjust Insulation / Heat Loss
+Adjust Steam Demand (only 1 may be selected)
+Adjust Steam Turbine Operation
+Adjusted
+Adjusted Energy Flows
+Adjusted Model
+Adjusted Model Cleared
+Adjusted Model Generated Successfully
+Adjusted Model NOT Generated: No Projects Selected
+Adjusted Model: Active Projects
+Adjusted Model: Diagram
+Adjusted Status
+Advanced Manufacturing Office
+All of Steam Calculators are part of a single standalone web-based application developed in PHP using support software libraries
+Allowed Range / Limits
+An error occurred
+An open source, object-oriented web application framework
+Any
+Any user data entered into the Steam Calculators is only saved for a specific browser session. Close the browser and all data is deleted. None of Steam Calculators specifically record, maintain, or otherwise profile user data.
+Assumptions
+Average cost per unit of electricity
+Average power imported or exported. Does not include power generated and used onsite.<br>-<span style='font-style: italic;'>Negative if exporting.</span>
+Average temperature of combined condensate returned.
+Average temperature of make-up water.<br>-<span style='font-style: italic;'>Generally close to average outside temperature.</span>
+BETA: Advanced Manufacturing Office: Steam Calculators
+Balance Header
+Base Energy Flows
+Base Model
+Base Model Generated Successfully
+Base Model Loaded
+Base Model Only
+Base Model vs Adjusted Model
+Base Model vs. Adjusted Model
+Base Model: Diagram
+Base and Adjusted Model
+Base and Adjusted Model Loaded
+Baseline (0 Energy Flow) is set at the triple point for water.
+Blowdown
+Blowdown Energy Flow
+Blowdown Flash to LP
+Blowdown Flashed to MP
+Blowdown Mass Flow
+Blowdown Rate
+Blowdown Rate is the % of incoming feedwater mass flow rate that leaves the boiler as a saturated liquid at boiler pressure.
+Blowdown flashed?
+Blowdown is saturated liquid continuously and/or routinely  drained from a boiler to control the concentration of dissolved solids. These solids have no other way of leaving the boiler and can be harmful to the boiler at excessive concentrations.
+Boiler
+Boiler Calculator
+Boiler Combustion Efficiency
+Boiler Details
+Boiler Energy
+Boiler Energy (Flow)
+Boiler Energy Losses
+Boiler Feedwater
+Boiler Fuel
+Boiler Fuel Costs
+Boiler Fuel Usage
+Boiler Losses
+Boiler Steam
+Boiler and fuel types are not considered.
+CLEAR ADJUSTED MODEL
+CLEAR MODEL
+Calculates saturated liquid and gas properties for a given pressure or temperature using the IAPWS Industrial Formulation 1997.
+Calculates steam and liquid water properties given two properties using the IAPWS Industrial Formulation 1997.
+Calculates the combined steam properties of multiple steam inlets.
+Calculates the energy (heat) loss and outlet steam properties given inlet steam conditions and a % heat loss.
+Calculates the energy generated or steam outlet conditions for a steam turbine.
+Calculates the properties of steam after a pressure drop with optional desuperheating.
+Calculation Details
+Calculation Details and Assumptions below
+Calculators
+Celsius °C
+Change Boiler Blowdown Rate
+Change Boiler Combustion Efficiency
+Change DA Operating Conditions
+Change Steam Generation Conditions
+Clear Adjusted Steam Model?
+Clear Entire Steam Model?
+Click on any of the links below to load the example into the steam modeler
+Click-on and mouse-over equipment and components for more details.
+Combined Header
+Combustion Efficiency
+Combustion Efficiency is the % of fuel energy that is directly added to the feedwater and not otherwise lost or used.
+Compare Base Model to Adjusted Model
+Comparison
+Cond Turbine
+Cond Turbine Losses
+Condensate
+Condensate Flash
+Condensate Flash to LP
+Condensate Flash to MP
+Condensate Flashed
+Condensate Heat Loss
+Condensate Recovery
+Condensate Return
+Condensate Return Temp
+Condensate Return Temperature
+Condensate Returned
+Condensed steam that is collected and, if suitable, returned the boiler.
+Condenser Pressure
+Condensing Steam Turbine
+Condensing Turbine
+Condensing Turbine Inlet
+Contact Steam
+Copy the ENTIRE "Upload Data" spreadsheet and paste it here
+Copy this ENTIRE spreadsheet and paste it into the steam tool reload/upload field to reload this model.
+Copy to Boiler Calculator
+Cost Summary
+Cost of Fuel per Energy Unit.
+Cost of Make up water per Volume
+Create Adjusted Model
+Create Base Model
+Creates a basic steam system model with up to 3 different pressure headers.
+Critical-Point
+Currency Symbol
+Custom
+Deaerator
+Deaerator Calculator
+Deaerator Feed
+Deaerator Pressure
+Deaerator Steam
+Deaerator Steam Vent
+Deaerator Vent Rate
+Deaerator provides feedwater near the boiling temperature for the deaerator's set operating pressure. (Saturated Liquid)
+Deaerator vent rate as a % of feedwater flow.<br>-<span style='font-style: italic;'>Commonly 0.1 to 0.2</span>
+Deaerator vent rate as a % of feedwater flow.<br>-<span style='font-style: italic;'>Commonly between 0.1 to 0.5</span>
+Deareator
+Degrees Above Boiling Point Temperature.<BR><span style='font-style: italic;'>-0 equals saturated gas</span>
+Degrees Above Boiling Temperature
+Demand
+Density
+Deparment of Energy:
+Desup Feedwater to LP
+Desup Feedwater to MP
+Desuperheat Steam into LP
+Desuperheat Steam into MP
+Desuperheating
+Desuperheating Feedwater
+Desuperheating Temperature
+Determine Blowdown Properties and Mass Flow
+Determine Boiler Energy
+Determine Feedwater Properties and Mass Flow
+Determine Fuel Energy
+Determines the amount of fuel energy required to produce steam with specified properties at a given flow rate using general boiler operational characteristics.
+Determines the mass flows and properties of any resulting outlet gas and/or liquid for given inlet conditions.
+Determines the required water and steam flows for a required feedwater mass flow.
+Development Details
+Diagram
+Does not include any evaluation of any complex boiler configurations or fluctuations in operation.
+Doesn't include Condensate Tank Vent or Blowdown Heat Exchangers.
+Doesn't include steam leaks and trap leaks estimates, set SSAT to 0 (zero) traps and steam leaks.
+Download Excel
+Download Options
+Electricity
+Electricity Costs
+Electricity Unit Cost
+Energy
+Energy Flow
+Energy Out
+Energy from motors (pumps, fans, etc.) are not considered.
+Enter
+Enthalpy
+Entropy
+Equipment
+Equipment Calculators
+Evaporation
+Example
+Example: RANDOM Model - Loaded Successfully
+Example: SSAT Default 3 Header Model - Loaded Successfully
+Example: SSAT3 with no Turbines- Loaded Successfully
+Examples
+Exception information
+Export Model to POT
+Export to AMO Tracker
+Fahrenheit °F
+Feedwater
+Feedwater Energy Flow
+Feedwater MF
+Feedwater Mass Flow
+Feedwater Pressure
+Feedwater Pressure.
+Feedwater Quality
+Feedwater Quality: Ratio of Gas/Vapor Mass to total Mass.
+Feedwater SE
+Feedwater Specific Enthalpy
+Feedwater Specific Entropy
+Feedwater Temperature
+Feedwater Temperature.
+Feedwater is pumped into PRV at outlet pressure without a change in energy.
+Fixed Flow
+Fixed Mass Flow
+Fixed Power
+Fixed Power Generation
+Fixed mass flow of steam through the turbine.
+Fixed power generation for the turbine.
+Flash
+Flash Blowdown? Base
+Flash Condensate
+Flash Condensate Return
+Flash Condensate into Header
+Flash Condensate to LP? Base
+Flash Condensate to Lower Header
+Flash Condensate to MP? Base
+Flash Tank
+Flash Tank Calculator
+Flash Tank Pressure
+Flow
+Flow Range
+Flows are determined using mass and energy balance equations
+For EERE Web Site Policies see
+Fuel Balance
+Fuel Cost
+Fuel Energy
+Fuel Unit Cost
+GENERATE ADJUSTED MODEL
+GENERATE BASE MODEL
+Gas
+General Details
+Generate a Base Model
+Generate an Adjusted Model
+Generated by the:
+Generation
+Generation Efficiency
+Generator Efficiency
+Glossary
+HEADERS
+HP
+HP Cond Flashed to MP
+HP Energy Losses
+HP Header
+HP Process Losses
+HP Processes
+HP to LP Steam Turbine
+HP to LP Turbine
+HP to LP Turbine Inlet
+HP to LP Turbine Outlet
+HP to MP PRV
+HP to MP PRV Inlet
+HP to MP Steam Turbine
+HP to MP Turbine
+HP to MP Turbine Inlet
+HP to MP Turbine Outlet
+HP tp MP Turbine
+HP: Condensate Recovery Rate
+HP: High Pressure
+HP: Steam Usage
+Header
+Header Calculator
+Header Details
+Header Heat Loss as a Percent of Energy Flow.
+Header Pressure
+Header Specific Enthalpy
+Heat Loss
+Heat Loss Calculator
+Heat Loss Percent
+High Pressure process steam usage. Includes any header steam leaks.
+IAPWS Website
+IAPWS-IF97
+IDEAL Outlet Specific Enthalpy
+If Inlet Specific Enthalpy is greater than the Saturated Gas Specific Enthalpy, only Steam leaves the flash tank at inlet specific enthalpy and flash tank pressure.
+If Inlet Specific Enthalpy is in between, proceed to Step 4
+If Inlet Specific Enthalpy is less than the Saturated Liquid Specific Enthalpy, only liquid leaves the flash tank at inlet specific enthalpy and flash tank pressure.
+If the Desuperheated Outlet specific enthalpy is less than the Feedwater specific enthalpy or greater than the Inlet Steam specific enthalpy, 
+Imperial
+Import
+Individual Steam Properties
+Individual Steam Properties Calculator
+Initial Boiler Blowdown Rate
+Initial Boiler Combustion Efficiency
+Initial DA Pressure
+Initial DA Vent Rate
+Initial HP Condenstate Return
+Initial HP Energy Usage
+Initial HP Heat Loss
+Initial HP Steam Usage
+Initial LP Condenstate Return
+Initial LP Energy Usage
+Initial LP Heat Loss
+Initial LP Steam Usage
+Initial MP Condenstate Return
+Initial MP Energy Usage
+Initial MP Heat Loss
+Initial MP Steam Usage
+Initial Turbine Status
+Inlet
+Inlet 1
+Inlet 1 Mass Flow
+Inlet 2
+Inlet 2 Mass Flow
+Inlet 3
+Inlet 3 Mass Flow
+Inlet 4
+Inlet 4 Mass Flow
+Inlet 5
+Inlet 5 Mass Flow
+Inlet 6
+Inlet 6 Mass Flow
+Inlet 7
+Inlet 7 Mass Flow
+Inlet 8 Mass Flow
+Inlet 9 Mass Flow
+Inlet Energy Flow
+Inlet Energy Flows equal Outlet Energy Flow.
+Inlet Mass Flow
+Inlet Mass Flow equals Outlet Mass Flow.
+Inlet Mass Flows equal Outlet Mass Flow.
+Inlet Pressure
+Inlet Pressure.<br><span style='font-style: italic'>-Commonly between 0 and 300<br> and occasionally much greater.</span>
+Inlet Quality
+Inlet Quality: Ratio of Gas/Vapor Mass to total Mass.
+Inlet Specific Enthalpy
+Inlet Specific Entropy
+Inlet Steam
+Inlet Steam Contains Condensate
+Inlet Steam MF
+Inlet Steam Mass Flow
+Inlet Steam SE
+Inlet Steam Specific Enthalpy
+Inlet Temperature
+Inlet Temperature.<br><span style='font-style: italic'>-If below boiler point, inlet will be a liquid.</span>
+Inlet Water
+Inlet Water MF
+Inlet Water Mass Flow
+Inlet Water SE
+Inlet Water Specific Enthalpy
+Inlet1
+Inlet1 Pressure
+Inlet1 Quality
+Inlet1 Specific Enthalpy
+Inlet1 Specific Entropy
+Inlet1 Temperature
+Inlet2
+Inlet2 Pressure
+Inlet2 Quality
+Inlet2 Specific Enthalpy
+Inlet2 Specific Entropy
+Inlet2 Temperature
+Inlet3
+Inlet3 Pressure
+Inlet3 Quality
+Inlet3 Specific Enthalpy
+Inlet3 Specific Entropy
+Inlet3 Temperature
+Inlet4
+Inlet4 Pressure
+Inlet4 Quality
+Inlet4 Specific Enthalpy
+Inlet4 Specific Entropy
+Inlet4 Temperature
+Inlet5
+Inlet5 Pressure
+Inlet5 Quality
+Inlet5 Specific Enthalpy
+Inlet5 Specific Entropy
+Inlet5 Temperature
+Inlet6
+Inlet6 Pressure
+Inlet6 Quality
+Inlet6 Specific Enthalpy
+Inlet6 Specific Entropy
+Inlet6 Temperature
+Inlet7
+Inlet7 Pressure
+Inlet7 Quality
+Inlet7 Specific Enthalpy
+Inlet7 Specific Entropy
+Inlet7 Temperature
+Inlet8 Pressure
+Inlet8 Quality
+Inlet8 Specific Enthalpy
+Inlet8 Specific Entropy
+Inlet8 Temperature
+Inlet9 Pressure
+Inlet9 Quality
+Inlet9 Specific Enthalpy
+Inlet9 Specific Entropy
+Inlet9 Temperature
+Is the blowdown flashed?
+Isenthalpic Process
+Isentropic Efficiency
+Isentropic Process
+Kelvin K
+LP
+LP Condensate Losses
+LP Energy Losses
+LP Header
+LP Processes
+LP Vented Steam
+LP: Condensate Recovery Rate
+LP: Medium Pressure
+LP: Steam Usage
+Language
+Liquid
+Load Adjusted Model as Base Model
+Load Adjusted as Base
+Load an example [below]
+Loaded Model must be cleared to view and load examples.
+Loss
+Low Pressure process steam usage. Includes any header steam leaks.
+MF
+MP
+MP Cond Flashed to LP
+MP Condensate Losses
+MP Energy Losses
+MP Header
+MP Processes
+MP to LP PRV
+MP to LP Steam Turbine
+MP to LP Turbine
+MP to LP Turbine Inlet
+MP to LP Turbine Outlet
+MP: Condensate Recovery Rate
+MP: Medium Pressure
+MP: Steam Usage
+MPa (absolute)
+Main
+Make Up Water
+Make up Water
+Make-Up Unit Water Cost
+Make-Up Water
+Make-Up Water Cost
+Make-Up Water Temperature
+Make-Up Water Unit Cost
+Manually enter specific steam system details
+Marginal Steam Cost
+Mass Flow
+Mass and Energy flows are listed and summed system wide and by major component, demonstrating that all mass and energy is accounted for and the model has correctly converged.
+Mass flow of inlet steam.
+Mass flow of steam (or liquid).
+Mass flow of steam generated by the boiler.
+Mass flow of steam.
+Maximum
+Maximum Flow
+Maximum Mass Flow
+Maximum Power
+Maximum Power Generation
+Maximum mass flow of steam through the turbine.
+Maximum power generation for the turbine.
+Measurement System
+Medium Pressure process steam usage. Includes any header steam leaks.
+Minimum
+Minimum Flow
+Minimum Inlet Energy Flow
+Minimum Mass Flow
+Minimum Power
+Minimum Power Generation
+Minimum mass flow of steam through the turbine.
+Minimum power generation for the turbine.
+Model Cleared
+Modify HP to Condensing Steam Turbine
+Modify HP to LP Steam Turbine
+Modify HP to MP Steam Turbine
+Modify MP to LP Steam Turbine
+Modify Process Energy Demand
+Modify Process Steam Demand/Usage
+Mouse Over
+NEW Blowdown Rate
+NEW Combustion Efficiency
+NEW Condenstate Return
+NEW DA Pressure
+NEW DA Vent Rate
+NEW Energy Usage
+NEW Heat Loss
+NEW Steam Usage
+New HP Steam Usage
+New LP Steam Usage
+Nm³
+No
+No Turbines
+No translation for the language 'de' available.
+No translation for the language 'zh' available.
+Not Desuperheaing
+Number of Headers
+Number of Inlets
+Off
+On
+On/Off
+Operating pressure of the deaerator used to determine the feedwater properties.<BR><span style='font-style: italic; color: red;'>MUST also be lower than steam pressure</span>
+Operating pressure of the deaerator used to determine the feedwater properties.<BR><span style='font-style: italic; color: red;'>MUST also be lower than the lowest steam header pressure</span>
+Operation
+Operation Type
+Optional Adjusted Model
+Options
+Outlet
+Outlet Energy Flow
+Outlet Gas
+Outlet Gas MF
+Outlet Gas SE
+Outlet Liquid
+Outlet Liquid MF
+Outlet Liquid SE
+Outlet Mass Flow
+Outlet Pressure
+Outlet Pressure.<br><span style='font-style: italic; color: red;'>MUST also be less than the inlet pressure.</span>
+Outlet Properties
+Outlet Quality
+Outlet Specific Enthalpy
+Outlet Specific Entropy
+Outlet Steam
+Outlet Steam MF
+Outlet Steam SE
+Outlet Temperature
+Outlet pressure of PRV.<BR><span style='font-style: italic; color: red;'>MUST also be lower than inlet pressure</span>
+Outlet specific enthalpy associated with set desuperheating temperature is greater than the inlet specific enthalpy. Desuperheating canceled.
+Outlet specific enthalpy associated with set desuperheating temperature is less than specific enthalpy for saturated steam. Desuperheating canceled.
+Overview
+PRV
+PRV w/ Desuperheating
+PRV w/ Desuperheating Calculator
+Percent Heat Loss
+Percent of HP process steam use returned as condensate.
+Percent of LP process steam use returned as condensate.
+Percent of MP process steam use returned as condensate.
+Percent of feedwater massflow leaving the boiler as blowdown.<BR><span style='font-style: italic;'>-Commonly between 1% to 5%
+Percent of feedwater massflow leaving the boiler as blowdown.<BR><span style='font-style: italic;'>-Generally 1% to 5%
+Percent of fuel energy added to the feedwater.<BR><span style='font-style: italic;'>-Generally 75% to 85%
+Percent of heat lost between inlet and outlet. 
+Permanently Storage Preferences
+Phase
+Phase / Quality
+Power
+Power Balance
+Power Cost
+Power Generated
+Power Generation
+Power Import
+Power Out
+Power Range
+Prefences Updated Successfully
+Preferences
+Pressure
+Pressure cannot be above critical point as there is no longer a phase change.
+Pressure cannot be in supercritical region (>%max%) when Quality is selected.
+Pressure of flash tank and outlet gas and liquid.<br><span style='font-style: italic; color: red;'>Must also be below Inlet Pressure</span>
+Pressure of the High Pressure (HP) Header.
+Pressure of the Low Pressure (MP) Header.
+Pressure of the Medium Pressure (MP) Header.
+Printable Version
+Proceed to Step 4
+Process Usage
+Properties Calculators
+Provides abstractions for low-level interaction and animation
+Quality
+Quality of Steam: Ratio of Gas/Vapor Mass to total Mass.<br><span style='font-style: italic'>-Most commonly set to 1 which means the steam is a Saturated Gas (100% Vapor).</span>
+Random
+Random - No Desuperheating
+Random - With Desuperheating
+Random Inlets
+Random Pressure
+Random Temperature
+Rankine °R
+Recent Properties (max 20)
+Recent Saturation Properties (max 20)
+Reduction
+Reduction<
+Related: Quality
+Reload Base Model
+Reload Model
+Reload Steam System Model
+Reload a previously downloaded model
+Removes dissolved gases from boiler feedwater by increasing the temperature to almost boiling.
+Required
+Required mass flow of feedwater.
+Resources
+SE
+SI
+SSAT Default 1 Header Model
+SSAT Default 2 Header Model
+SSAT Default 3 Header Model
+Sat. Gas
+Sat. Liquid
+Saturated
+Saturated Fluid (Liquid or Gas)
+Saturated Gas
+Saturated Gas: Specific Enthalpy
+Saturated Liquid
+Saturated Liquid: Specific Enthalpy
+Saturated Mixture
+Saturated Properties
+Saturated Property Calculator
+Saturated Quality
+Saturated Steam
+Saturation Properties
+Saturation Properties Calculator
+Select "Custom" to pick individual units.
+Select Potential Adjustments/Projects
+Select Reload Type
+Selected Turbine Property
+Set Adjusted Model as Base Model
+Set preferred unit systems, individual units, and languages.
+Site Power Import
+Site Power Imported
+Solve for Isentropic Efficiency
+Solve for Outlet Properties
+Solve for:
+Sp. Enthalpy
+Sp. Entropy
+Specific Enthalpy
+Specific Entropy
+Specific Volume
+Steam
+Steam Balance
+Steam Calculators
+Steam Calculators Glossary
+Steam Condensing in Turbine
+Steam Energy Flow
+Steam Equipment Calculators
+Steam Flow
+Steam Generated
+Steam Mass Flow
+Steam Modeler
+Steam Modeler Examples
+Steam Pressure
+Steam Pressure.<BR>Also used as Boiler and Blowdown Pressure.<br><span style='font-style: italic'>-Commonly between 0 and 300<br> and occasionally much greater.</span>
+Steam Properties
+Steam Property Calculations
+Steam Property Calculator
+Steam Property Calculators
+Steam Quality
+Steam Resources
+Steam Specific Enthalpy
+Steam Specific Entropy
+Steam System Model
+Steam System Modeler
+Steam Temperature
+Steam Tool System Modeler
+Steam Turbine
+Steam Turbine Calculator
+Steam Turbine Details
+Steam Usage
+Steam that comes in direct contact with the process materials. This cannot be collected and reused as it can potentially contain contaminants that can harm the system.
+Steam with a temperature above the boiling point for its pressure.
+Steam, Boiler, and Blowdown Pressure are the same.
+Step 1
+Step 1: Determine Inlet Properties
+Step 1: Determine Inlet Steam Properties
+Step 1: Determine Inlet Water Properties
+Step 1: Determine Properties of Steam Produced
+Step 1: Determine the properties and energy flows for the inlets
+Step 2
+Step 2 "If Desuperheating": Determine Cooling Water Properties
+Step 2 "If NO Desuperheating": Determine Outlet Steam Properties
+Step 2: Calculate Ideal Outlet Properties (Inlet Entropy equals Outlet Entropy)
+Step 2: Determine Inlet Steam Properties
+Step 2: Determine Outlet Energy Flow after Heat Loss
+Step 2: Determine the Header Specific Enthalpy
+Step 2: Determine the Specific Enthalpy and other properties for Saturated Liquid and Gas at Flash Pressure
+Step 3
+Step 3: Determine Desuperheated Outlet Steam Properties
+Step 3: Determine Feedwater and Vented Steam Properties
+Step 3: Determine Header Properties
+Step 3: Determine Outlet Properties
+Step 3: Evaluate Flash Tank
+Step 3: If solve for "Isentropic Efficiency", Determine Outlet Properties
+Step 3: If solve for "Outlet Properties", Determine Outlet Specific Enthalpy
+Step 4
+Step 4: Calculate Steam Turbine Energy Out and Generation (Power Out)
+Step 4: Determine Feedwater and Outlet Mass Flows
+Step 4: Determine Feedwater and Vented Mass Flows and Total Outlet Energy Flows
+Step 4: Determine Flash Properties
+Step 5
+Step 5: Determine Inlet Water and Steam Mass Flows
+Sub-Cooled Liquid
+Subcooled Liquid
+Super-Heated Gas
+Super-heated Steam
+Superheated Steam
+System
+System Steam Modeler
+TOTAL
+TOTALs may include a small difference from rounding.
+Tank Pressure
+Target Desuperheating Temperature
+Target desuperheating temperature for the PRV outlet into LP
+Target desuperheating temperature for the PRV outlet into MP
+Temperature
+Temperature cannot be above critical point as there is no longer a phase change.
+Temperature of the Steam.<br><span style='font-style: italic'>-If below boiler point, steam will not be generated.</span>
+Temperature-Entropy Diagram
+The % of fuel energy successfully added to the water in the boiler and not otherwise lost.
+The % of fuel energy that is directly added to the feedwater. Commonly 78% to 84%.
+The Adjusted Model is NOW the Base Model
+The DA has no additional heat or masses losses.
+The DA vented gases are assumed to be saturated gas at DA pressure.
+The Deaerator (DA) Vent Rate is a percent of feedwater flow.
+The PRV (without desuperheating) is an isenthalpic process where inlet and outlet specific enthalpy is the same.
+The Steam Calculators calculate all steam properties using the International Association for the Properties of Water and Steam's Thermodynamic Properties of Water and Steam Industrial Formulation
+The Steam Calculators calculate all steam properties using the International Association for the Properties of Water and Steam's Thermodynamic Properties of Water and Steam Industrial Formulation, IAPWS-IF97, 2007
+The Steam Calculators include property and equipment calculators as well as a basic steam system modeler.
+The Steam Calculators provide a variety of steam related calculations and models with comprehensive calculation descriptions and details.
+The Steam Calculators were developed by Michael B Muller for the U.S. Department of Energy and Oak Ridge National Labs.
+The combined inlet pressures are adjusted to match the header pressure without energy loss or gain.
+The conversion efficiency to electricity.<br>-<span style='font-style:italic;'>-Commonly 95%</span>
+The electricity generated by the turbine
+The energy actually removed as a percent (%) of the energy removed if the turbine were an isentropic process (entropy in equal entropy out).<br>-<span style='font-style:italic;'>-Commonly 55% to 80%</span>
+The energy actually removed as a percent (%) of the energy removed if the turbine were an isentropic process.
+The export option is limited to English using imperial units.
+The feedwater flow rate can be calculated from steam mass flow and blowdown rate
+The feedwater leaves the DA as a saturated liquid at DA pressure.
+The header specific enthalpy can be calculated by dividing the Total Inlet Energy Flows by the Total Inlet Mass Flows
+The inlet mass flows are determine based on an energy and mass flow balance
+The language 'de_CH' has to be added before it can be used.
+The language 'zh' has to be added before it can be used.
+The outlet specific enthalpy is determined from energy and mass flows
+The percent (%) of energy removed from steam that is converted to electricity.<br>-<span style='font-style:italic;'>-Commonly 90% to 99%</span>
+The pressure in the turbine's condenser associated with the condensing temperature.<br>-<span style='font-style:italic;'>-Commonly much less than atmospheric temperature.</span>
+The pressure of the deaerator (DA).<br>-<span style='font-style: italic;'>Commonly 0 to 30</span>
+The pressure of the header.
+The process involving the reduction in pressure of a liquid causing a portion to vaporize (Flash). A flash tank allows for the separation of the resulting liquid and gas.
+The ratio of Saturated Gas/Vapor to total mass.
+The target temperature for desuperheating the outlet steam.<BR><span style='font-style: italic;'>-Must be below outlet temperature without desuperheating to have an affect.</apsn>
+The temperature and pressure at which the phase boundaries no longer exists.
+The temperature and pressure at which the three phases (gas, liquid, and solid) of that substance coexist in thermodynamic equilibrium.
+There are 3 reload options
+There are 3 ways to generate a Base Model
+This is a snap shot of a steam system model generated with the online steam tool. Updating individual fields WILL NOT update other fields, spreadsheets, or the overall model.
+This model can be reloaded to the online Steam System Modeler by following the instructions on the "Upload Data" spreadsheet.
+To enhance user interactions, the calculators also extensively use JavaScript and the following JavaScript Libraries
+Total Cost
+Total DA Mass Flow
+Total Energy Flow
+Total Inlet Energy Flow
+Total Inlet Mass Flow
+Total Inlet and Outlet Energy flows are equal. No energy is lost or gained.
+Total Inlet and Outlet Mass flows are equal. No mass is lost or gained.
+Total Mass Flow
+Total Operating Cost
+Total Operating Costs
+Total Outlet Energy Flow
+Total Site Demand
+Total operating hours over 1 year.
+Triple-Point
+U.S. Department of Energy - Energy Efficiency and Renewable Energy
+UPDATE PREFERENCES
+Unit
+Unit Cost
+Units
+Units may be customized and a few alternate language options are available in
+Unless adjusted Steam Demands are set, the Adjusted Model's process energy usage will be set to match the Base Model,
+Update
+Update Adjustments
+Update Model
+Upload Data
+User Data Not Specifically Recorded by Steam Calculators
+Using an mass and energy balance equations
+Using the Steam Property Calculator, properties are determined using Deaerator Pressure 
+Using the Steam Property Calculator, properties are determined using Header Pressure 
+Using the Steam Property Calculator, properties are determined using Inlet Pressure 
+Using the Steam Property Calculator, properties are determined using Inlet Steam Pressure 
+Using the Steam Property Calculator, properties are determined using Inlet Water Pressure 
+Using the Steam Property Calculator, properties are determined using Outlet Pressure 
+Using the Steam Property Calculator, properties are determined using Pressure and Specific Enthalpy
+Using the Steam Property Calculator, properties are determined using Steam Pressure 
+Using the Steam Property Calculator, properties are determined using Steam Pressure and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality). The Specific Enthalpy is then multiplied by the Mass Flow to get the Energy Flow
+Using the Steam System Modeler
+Using the calculated feedwater mass flow and blowdown rate
+Using the outlet specific enthalpy, calculate the isentropic efficiency
+Using the outlet specific enthalpy, calculate the outlet properties
+Utility Balance
+Vacuum Pressure
+Value is required and can't be empty
+Vent Rate
+Vented Steam
+Vented Steam Mass Flow
+Vented Steam Specific Enthalpy
+View Diagram
+View Energy Flow
+View Steam Balance
+Volume
+Volume Flow
+WARNING
+Water
+Water Pressure
+Water Quality
+Water Specific Enthalpy
+Water Specific Entropy
+Water Temperature
+Water added to the system to make-up for steam and water losses.
+Water that is fed into the boiler after having been filtered, chemically treated, heated, and/or pressurized.
+Water with a temperature below the boiling point for its pressure.
+Web Site Policies
+Yearly Operating Hours
+Yes
+[Demo] Steam Calculators
+[Demo] Steam Tool
+bar (absolute)
+bar (gauge)
+clear
+difference
+download
+ft³/lb
+g/m³
+gpm
+kJ/hr
+kPa (absolute)
+kPa (gauge)
+kg/m³
+link
+link to website
+lpm
+m³
+m³/g
+m³/kg
+m³pm
+no Adjusted Model
+none
+psi (absolute)
+psi (gauge)
+reset
+select below to load Base Model with Adjusted Model
+select below to only load Base Model
+units

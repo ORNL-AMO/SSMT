@@ -1,0 +1,25 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Properties Calculators
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$mS = Steam_MeasurementSystem::getInstance();
+$diagram = new Steam_Diagram();
+if (isset($_GET['p']) ){
+    $steamPoint = new Steam_Object(array(
+        'specificEntropy' => $mS->standardize($_GET['s'],'specificEntropy'),
+        'pressure' => $mS->standardize($_GET['p'],'pressure')
+        ));
+    $diagram->highlightSteamTS($steamPoint);
+}
+
+if (isset($_GET['satT']) ){
+    $diagram->highlightSaturatedLine($_GET['satT'],$_GET['entropyLiquid'],$_GET['entropyGas']);
+}

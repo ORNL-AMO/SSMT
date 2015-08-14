@@ -1,0 +1,60 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+$action = Zend_Controller_Front::getInstance()->getRequest()->getActionName();
+?>
+<ul id="iacNavBar">
+    <li <?php if ( $action == 'index' ) echo "style='background-color: #DDDDDD;'";?>><a href="./"><?php echo $this->translator->_('Main');?></a></li>
+    <li>
+        <ul>
+            <li <?php if ( $action == 'about' ) echo "style='background-color: #DDDDDD;'";?>><a href="about"><?php echo $this->translator->_('About');?></a></li>
+            <li <?php if ( $action == 'preferences' ) echo "style='background-color: #DDDDDD;'";?>><a href="preferences"><?php echo $this->translator->_('Preferences');?></a>
+
+            <li <?php if ( $action == 'glossary' ) echo "style='background-color: #DDDDDD;'";?>><a href="glossary"><?php echo $this->translator->_('Glossary');?></a></li>
+            <li <?php if ( $action == 'resources' ) echo "style='background-color: #DDDDDD;'";?>><a href="resources"><?php echo $this->translator->_('Resources');?></a></li>
+            <li <?php if ( $action == 'tutorials' ) echo "style='background-color: #DDDDDD;'";?>><a href="tutorials"><?php echo $this->translator->_('Tutorials');?></a></li>
+
+        </ul>
+    </li>
+
+    <li><?php echo $this->translator->_('Properties Calculators'); ?>:
+        <ul>
+            <li <?php if ( $action == 'propSaturated' ) echo "style='background-color: #DDDDDD;'";?>><a href="propSaturated"><?php echo $this->translator->_('Saturated Properties');?></a></li>
+            <li <?php if ( $action == 'propSteam' ) echo "style='background-color: #DDDDDD;'";?>><a href="propSteam"><?php echo $this->translator->_('Steam Properties');?></a></li>
+        </ul>                        
+    </li>
+    
+    <li><?php echo $this->translator->_('Equipment');?> <?php echo $this->translator->_('Calculators');?>:
+    <ul>
+        <li <?php if ( $action == 'equipBoiler' ) echo "style='background-color: #DDDDDD;'";?>><a href="equipBoiler"><?php echo $this->translator->_('Boiler');?></a></li>
+        <li <?php if ( $action == 'equipHeatloss' ) echo "style='background-color: #DDDDDD;'";?>><a href="equipHeatloss"><?php echo $this->translator->_('Heat Loss');?></a></li>
+        <li <?php if ( $action == 'equipFlashtank' ) echo "style='background-color: #DDDDDD;'";?>><a href="equipFlashtank"><?php echo $this->translator->_('Flash Tank');?></a></li>
+        <li <?php if ( $action == 'equipPrv' ) echo "style='background-color: #DDDDDD;'";?>><a href="equipPrv"><?php echo $this->translator->_('PRV w/ Desuperheating');?></a></li>
+        <li <?php if ( $action == 'equipHeader' ) echo "style='background-color: #DDDDDD;'";?>><a href="equipHeader"><?php echo $this->translator->_('Header');?></a></li>
+        <li <?php if ( $action == 'equipDeaerator' ) echo "style='background-color: #DDDDDD;'";?>><a href="equipDeaerator"><?php echo $this->translator->_('Deaerator');?></a></li>
+        <li <?php if ( $action == 'equipTurbine' ) echo "style='background-color: #DDDDDD;'";?>><a href="equipTurbine"><?php echo $this->translator->_('Steam Turbine');?></a></li>
+    </ul>
+    </li>
+    
+    <li <?php if (
+            $action=='overview'
+            or $action=='modeler'
+            or $action=='model'
+            or $action=='chart'
+            or $action=='baseModel'
+            or $action=='steamBalance'
+            or $action=='projectModel'
+            or $action=='projects'
+            or $action=='projectChart'
+            or $action=='summary'   
+            or $action=='export'               
+            ) echo "style='background-color: #DDDDDD;'";?>><a href="overview"><?php echo $this->translator->_('Steam System Modeler');?></a>
+    </li>
+</ul>
+

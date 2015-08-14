@@ -1,0 +1,33 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+?>
+<?php echo $this->render('amo_head.phtml'); ?>
+<body>
+    <!--stopindex-->
+    <div id="outer">
+        <?php echo $this->render('amo_header.phtml'); ?>
+        <div id="content">
+            <?php echo $this->render('amo-content-top.phtml'); ?>
+            <div class="grid_1">
+                <div id="leftnav">
+                    <?php echo $this->render($this->layout()->menu); ?>
+                </div>
+            </div><!--startindex-->
+            <div class="grid_7" id="maincontent">
+                <?php echo $this->layout()->content ?>
+            </div><!--stopindex-->
+        </div>
+    </div>
+    <div id="footer">
+        <?php echo $this->render('footer.phtml') ?>
+    </div>
+    <!--startindex-->
+</body>
+</html>

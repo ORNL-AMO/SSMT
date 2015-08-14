@@ -1,0 +1,83 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+
+echo $this->partial('index/partials/modelMenu.phtml', array('action' => 'steamBalance'));
+
+$mS = Steam_MeasurementSystem::getInstance();
+$SMC = $this->steamModelCommunicator;
+$steamBalance = new Steam_Model_Balance($SMC->baseModel);
+if ($SMC->adjustedLoaded) $steamBalanceAM = new Steam_Model_Balance($SMC->adjustedModels);
+?>
+
+<h2><?php echo $this->translator->_('Steam Balance');?></h2>
+<p><?php echo $this->translator->_('Mass and Energy flows are listed and summed system wide and by major component, demonstrating that all mass and energy is accounted for and the model has correctly converged.');?></p>
+
+
+<span style="font-size: .675em; color:red;">** <?php echo $this->translator->_('TOTALs may include a small difference from rounding.');?></span>
+<?php foreach($steamBalance->components as $component => $title){ ?>
+
+<table class="data">
+    <tr>
+        <th colspan="8"><?php echo $this->translator->_($title);?></th>
+    </tr>
+    <tr>
+        <td></td>
+        <th colspan="3"><?php echo $this->translator->_('Base Model');?></th>
+        <?php if ($SMC->adjustedLoaded){ ?>
+            <td style="width: 30px" rowspan="<?php echo count($steamBalance->pieces[$component])+2; ?>"></td>
+            <th colspan="3"><?php echo $this->translator->_('Adjusted Model');?></th>
+        <?php } ?>
+    </tr>
+    <tr>
+        <td></td><td><?php echo $mS->label('massflow'); ?></td>
+        <td><?php echo $mS->label('energyflow'); ?></td>
+        <td><?php echo $mS->label('specificEnthalpy'); ?></td>
+        <?php if ($SMC->adjustedLoaded){ ?>
+            <td><?php echo $mS->label('massflow'); ?></td><td><?php echo $mS->label('energyflow'); ?></td><td><?php echo $mS->label('specificEnthalpy'); ?></td>
+        <?php } ?>
+    </tr>
+    <?php foreach($steamBalance->pieces[$component] as $id => $label){ 
+        $color = 'green';
+        if ($steamBalance->sB[$component]['eF'][$id]<0) $color = 'red';
+        ?>
+    <tr>
+        <th><?php echo $this->translator->_($label); ?></th>
+        <td style="color: <?php echo $color;?>"><?php echo $mS->displayMassflow($steamBalance->sB[$component]['mF'][$id]); ?></td>
+        <td style="color: <?php echo $color;?>"><?php echo $mS->displayEnergyflow($steamBalance->sB[$component]['eF'][$id]); ?></td>
+        <td>
+        <?php if ($steamBalance->sB[$component]['mF'][$id]<>0 and $id<>'hpProcessLoss' and $id<>'mpProcessLoss' and $id<>'lpProcessLoss' ) 
+            echo $mS->displaySpecificEnthalpy($steamBalance->sB[$component]['eF'][$id]/$steamBalance->sB[$component]['mF'][$id]*1000); ?>
+        </td>        
+        <?php if ($SMC->adjustedLoaded){
+            $color = 'green';
+            if ($steamBalanceAM->sB[$component]['eF'][$id]<0) $color = 'red';?> 
+            <td style="color: <?php echo $color;?>"><?php echo $mS->displayMassflow($steamBalanceAM->sB[$component]['mF'][$id]); ?></td>
+            <td style="color: <?php echo $color;?>"><?php echo $mS->displayEnergyflow($steamBalanceAM->sB[$component]['eF'][$id]); ?></td>
+            <td>
+            <?php if ($steamBalanceAM->sB[$component]['mF'][$id]<>0 and $id<>'hpProcessLoss' and $id<>'mpProcessLoss' and $id<>'lpProcessLoss' ) 
+                echo $mS->displaySpecificEnthalpy($steamBalanceAM->sB[$component]['eF'][$id]/$steamBalanceAM->sB[$component]['mF'][$id]*1000); ?>
+            </td>
+        <?php } ?>
+    </tr>
+    <?php } ?>
+    <tr>
+        <th><?php echo $this->translator->_('TOTAL');?>:</th>
+        <td><?php echo $mS->displayMassflow(array_sum($steamBalance->sB[$component]['mF']));?></td>
+        <td><?php echo $mS->displayEnergyflow(array_sum($steamBalance->sB[$component]['eF']));?></td>
+        <?php if ($SMC->adjustedLoaded){ ?>
+            <td colspan="2" style="border-bottom: 0px;"></td>
+            <td><?php echo $mS->displayMassflow(array_sum($steamBalanceAM->sB[$component]['mF']));?></td>
+            <td><?php echo $mS->displayEnergyflow(array_sum($steamBalanceAM->sB[$component]['eF']));?></td>       
+        <?php } ?>
+    </tr>
+</table>
+<BR><BR>
+<?php } ?>
+

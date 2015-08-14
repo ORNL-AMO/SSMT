@@ -1,0 +1,162 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+        
+$this->translator = Zend_Registry::get('Zend_Translate');   
+$this->sMc = new Steam_Model_Communicator();  
+?>
+<script>           
+        $(document).ready(function() {
+            
+            <?php 
+            // Only position menu if models are loaded
+            if ($this->sMc->baseLoaded){?> 
+            $("#baseModelLinks").css({ top: ($('#baseModelMenu').position().top + $('#baseModelMenu').outerHeight(true))+'px'})
+            <?php } ?>
+            <?php if ($this->sMc->adjustedLoaded){?> 
+            $("#adjustedModelLinks").css({ top: ($('#adjustedModelMenu').position().top + $('#adjustedModelMenu').outerHeight(true))+'px'})
+            <?php } ?>
+            <?php if ($this->sMc->baseLoaded and $this->sMc->adjustedLoaded){?> 
+            $("#downloadLinks").css({ top: ($('#downloadMenu').position().top + $('#downloadMenu').outerHeight(true))+'px'})
+            <?php } ?>
+    
+            
+            $('#baseModelLinks').hide();
+            $('#baseModelMenu').mouseover(function(){
+                $('#baseModelLinks').show();
+                $('#baseArrow').attr("src",'images/arrowOpen.gif');
+            });
+            $('#baseModelLinks').mouseover(function(){
+                $('#baseModelLinks').show();
+                $('#baseArrow').attr("src",'images/arrowOpen.gif');
+            });
+            $('#baseModelMenu').mouseout(function(){
+                $('#baseModelLinks').hide();
+                $('#baseArrow').attr("src",'images/arrowClosed.gif');
+            });
+            $('#baseModelLinks').mouseout(function(){
+                $('#baseModelLinks').hide();
+                $('#baseArrow').attr("src",'images/arrowClosed.gif');
+            });
+            
+            $('#adjustedModelLinks').hide();
+            $('#adjustedModelMenu').mouseover(function(){
+                $('#adjustedModelLinks').show();
+                $('#adjustedArrow').attr("src",'images/arrowOpen.gif');
+            });
+            $('#adjustedModelLinks').mouseover(function(){
+                $('#adjustedModelLinks').show();
+                $('#adjustedArrow').attr("src",'images/arrowOpen.gif');
+            });
+            $('#adjustedModelMenu').mouseout(function(){
+                $('#adjustedModelLinks').hide();
+                $('#adjustedArrow').attr("src",'images/arrowClosed.gif');
+            });
+            $('#adjustedModelLinks').mouseout(function(){
+                $('#adjustedModelLinks').hide();
+                $('#adjustedArrow').attr("src",'images/arrowClosed.gif');
+            });
+            
+            $('#downloadLinks').hide();
+            $('#downloadMenu').mouseover(function(){
+                $('#downloadLinks').show();
+                $('#downloadArrow').attr("src",'images/arrowOpen.gif');
+            });
+            $('#downloadLinks').mouseover(function(){
+                $('#downloadLinks').show();
+                $('#downloadArrow').attr("src",'images/arrowOpen.gif');
+            });
+            $('#downloadMenu').mouseout(function(){
+                $('#downloadLinks').hide();
+                $('#downloadArrow').attr("src",'images/arrowClosed.gif');
+            });
+            $('#downloadLinks').mouseout(function(){
+                $('#downloadLinks').hide();
+                $('#downloadArrow').attr("src",'images/arrowClosed.gif');
+            });
+            
+        });
+</script>
+
+<table>
+    <tr>
+        <td style="width: 170px; vertical-align: middle; height: 50px;">                
+            <h1><?php echo $this->translator->_('Steam Modeler');?></h1>
+        </td><td>
+            <table class="data" style="margin-bottom: 0px; height: 38px;">
+                <tr>
+                    <td <?php if ($this->action=='modeler') echo "style='background-color: #DDD;'";?>><a href="overview"><?php echo $this->translator->_('Overview');?></a></td>
+                    <th>
+                        <table class="data" style="margin-bottom: 0px; background-color: white;">
+                            <tr>                    
+                                <?php if (!$this->sMc->baseLoaded){?>   
+        <td style="font-style: italic; font-weight: bold; <?php if ($this->action=='baseModel') echo "background-color: #DDD;";?>"><a href="baseModel"><?php echo $this->translator->_('Create Base Model');?></a></td>                    
+        <td style="font-style: italic; font-weight: bold; <?php if ($this->action=='reload') echo "background-color: #DDD;";?>"><a href="modelReload"><?php echo $this->translator->_('Reload Model');?></a></td>
+                                <?php } ?>                    
+                                <?php if ($this->sMc->baseLoaded){ ?>
+        <td id="baseModelMenu" style="padding-left: 2px; <?php if ($this->action=='baseDiagram' or $this->action=='baseModel' or $this->action=='baseEnergy' or $this->action=='steamBalance') echo "background-color: #DDD;";?>">
+        <img id="baseArrow" src="images/arrowClosed.gif" style="margin: 0px; vertical-align: middle;"><a href="baseDiagram"><?php echo $this->translator->_('Base Model');?></a></td>
+                                <?php } ?>                    
+                                <?php if ($this->sMc->baseLoaded and !$this->sMc->adjustedLoaded){?>   
+        <td style="font-style: italic; font-weight: bold; <?php if ($this->action=='adjustedModel') echo "background-color: #DDD;";?>"><a href="adjustedModel"><?php echo $this->translator->_('Create Adjusted Model');?></a></td>
+                                <?php } ?>
+                                <?php if ($this->sMc->baseLoaded and $this->sMc->adjustedLoaded){?>   
+        <td id="adjustedModelMenu"  style="padding-left: 2px; <?php if ($this->action=='adjustedDiagram' or $this->action=='adjustedModel' or $this->action=='adjustedEnergy' or $this->action=='steamBalance') echo "background-color: #DDD;";?>"><a href="adjustedDiagram">
+        <img id="adjustedArrow" src="images/arrowClosed.gif" style="margin: 0px; vertical-align: middle;"><?php echo $this->translator->_('Adjusted Model');?></a></td>       
+                                <?php } ?>
+                            </tr>
+                        </table>
+                    </th>        
+                    <?php if ($this->sMc->baseLoaded and $this->sMc->adjustedLoaded){?>   
+                <td style='font-weight: bold; <?php if ($this->action=='modelComparison') echo "background-color: #DDD;";?>'><a href="modelComparison"><?php echo $this->translator->_('Comparison');?></a></td>
+                <td id="downloadMenu" <?php if ($this->action=='export') echo "style='background-color: #DDD;'";?>><img id="downloadArrow" src="images/arrowClosed.gif" style="margin: 0px; vertical-align: middle;"><a style="margin: 5px;" href="downloadModel">[<?php echo $this->translator->_('download');?>]</a></td>
+                    <?php } ?>
+                    <?php if ($this->sMc->baseLoaded){?> 
+                <td style="background-color: #FEE;"><a style="margin: 15px; color: darkred;" href="overview?destroyModel=now" onclick="return confirm('<?php echo $this->translator->_('Clear Entire Steam Model?');?>')"><?php echo $this->translator->_('CLEAR MODEL');?></a></td>
+                    <?php } ?>              
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<div style="position: absolute; top: 34px; left: 350px; z-index: 100;" id="downloadLinks">
+   <table class="data" style=" border: 2px black solid;">
+        <tr style="background-color: white;">
+            <th style='padding: 10px;'><?php echo $this->translator->_('Download Options');?>:</th>
+    <td><a href="downloadModel"><?php echo $this->translator->_('Download Excel');?></a></td>
+    <td <?php if ($this->action=='export') echo "style='background-color: #DDD;'";?>><a href="export"><?php echo $this->translator->_('Export to AMO Tracker');?></a></td>
+        </tr>
+   </table>
+</div>
+
+<div style="position: absolute; top: 34px; left: 150px; z-index: 100;" id="baseModelLinks">
+    <table class="data" style=" border: 2px black solid;">
+        <tr style="background-color: white;">
+            <th style='padding: 10px;'><?php echo $this->translator->_('Base Model');?>:</th>
+            <td <?php if ($this->action=='baseDiagram') echo "style='background-color: #DDD;'";?>><a href="baseDiagram"><?php echo $this->translator->_('Diagram');?></a></td>
+            <td <?php if ($this->action=='baseModel') echo "style='background-color: #DDD;'";?>><a href="baseModel"><?php echo $this->translator->_('Update');?></a></td>
+            <td <?php if ($this->action=='steamBalance') echo "style='background-color: #DDD;'";?>><a href="steamBalance"><?php echo $this->translator->_('Steam Balance');?></a></td>
+            <td <?php if ($this->action=='baseEnergy') echo "style='background-color: #DDD;'";?>><a href="baseEnergy"><?php echo $this->translator->_('Energy Flow');?></a></td>
+        </tr>
+    </table>
+</div>
+
+<div style="position: absolute; top: 34px; left: 150px; z-index: 100;" id="adjustedModelLinks">
+    <table class="data" style=" border: 2px black solid;">
+        <tr style="background-color: white;">
+            <th style='padding: 10px;'><?php echo $this->translator->_('Adjusted Model');?>:</th>
+            <td <?php if ($this->action=='adjustedDiagram') echo "style='background-color: #DDD;'";?>><a href="adjustedDiagram"><?php echo $this->translator->_('Diagram');?></a></td>
+            <td <?php if ($this->action=='adjustedModel') echo "style='background-color: #DDD;'";?>><a href="adjustedModel"><?php echo $this->translator->_('Update');?></a></td>
+            <td <?php if ($this->action=='steamBalance') echo "style='background-color: #DDD;'";?>><a href="steamBalance"><?php echo $this->translator->_('Steam Balance');?></a></td>
+            <td <?php if ($this->action=='adjustedEnergy') echo "style='background-color: #DDD;'";?>><a href="adjustedEnergy"><?php echo $this->translator->_('Energy Flow');?></a></td>
+                <td style="background-color: #FEE;"><a style="margin: 5px; color: darkred;" href="overview?destroyAdjModel=now" onclick="return confirm('<?php echo $this->translator->_('Clear Adjusted Steam Model?');?>')"><?php echo $this->translator->_('CLEAR ADJUSTED MODEL');?></a></td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,39 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+?>
+<style type="text/css" scoped="scoped">    
+    #eere_header {background-color: #00324D; background-image:url('itp2011/images/header_logo.gif'); background-repeat:no-repeat; background-position:center; width:100%; height:60px;}
+</style>
+
+<div id="eere_header">
+    <div class="hide"><a href="#maincontent">Skip to Content</a></div>
+    <div id="eere_header_content">
+        <img src="itp2011/images/spacer.gif" alt="" width="350" height="60" id="headermap"  usemap="#map">
+        <map name="map" id="map">
+        <area shape="rect" coords="1,1,98,55" href="http://www.energy.gov/" alt="U.S. Department of Energy">
+        <area shape="rect" coords="101,1,238,56" href="http://www.eere.energy.gov/" alt="Energy Efficiency and Renewable Energy">
+        </map>
+        <div id="global_links"><a href="http://www.eere.energy.gov/">EERE Home</a> | <a href="http://www.eere.energy.gov/site_administration/programs_offices.html">Programs &amp; Offices</a> | <a href="http://www.energysavers.gov/">Consumer Information</a></div>
+    </div>
+</div>
+<div id="program_header_subsite_nonav">
+    <div id="program_header_subsite_content_nonav">
+        <div id="sitename"><a><?php echo $this->translator->_("Steam System Modeler Tool (SSMT)");?></a></div>          
+            <div style="position: relative; top: 4px; left: 720px; border: 0px red solid; width: 350px; padding: 5px;">
+                Questions? <a href="mailto:AMOeCenterHelpDesk@ppc.com?subject=DOE-AMO Steam Calculators">AMOeCenterHelpDesk@ppc.com</a>
+                 </div>
+<!--        <div style="position: relative; top: -54px; left: 370px; border: 4px red solid; width: 600px; padding: 5px;">
+            <span style="color: red; font-weight: bold;">ATTENTION BETA TESTERS</span><br>
+            The BETA testing has begun (so numerous minors issues are likely hidden throughout). There will be weekly, if not nightly, updates/builds.
+            Any feedback (positive or negative) is greatly appreciated.
+            <span style="display: block; margin-top: 5px;">Submit feedback using the feedback module, or send a direct email to <a href='mailto:emily.bailey@ppc.com'>emily.bailey@ppc.com</a></span>
+        </div> -->
+    </div>
+</div>

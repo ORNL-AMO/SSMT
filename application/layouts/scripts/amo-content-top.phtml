@@ -1,0 +1,28 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com> 
+ */
+?>
+<div id="utility_line" class="clearfix" style="position: relative; z-index: 50;">
+    <div id="breadcrumb">
+        <a href="http://www.eere.energy.gov/">EERE</a> &raquo; 
+        <a href="http://www1.eere.energy.gov/manufacturing/index.html">Advanced Manufacturing Office</a> &raquo; 
+        <?php         
+        $action = Zend_Controller_Front::getInstance()->getRequest()->getActionName();
+        echo Steam_Support::BreadCrumb($action); ?>
+    </div>
+    <ul id="utilities" class="nositemap"> <!--add class="nositemap" to <ul> if no site map and remove link> 		
+        <li id="sitemap"><a href="/sitemap.php">Site Map</a></li> -->
+        <li id="print"><a href="<?php echo $this->printString;?>"><?php echo $this->translator->_('Printable Version');?></a></li>
+        <li id="share"><!-- AddThis Button BEGIN -->
+        <script type="text/javascript">var addthis_config = {"data_track_clickback":true};</script>
+        <a class="addthis_button" href="http://addthis.com/bookmark.php?v=250&amp;username=addthiseere"><img src="http://s7.addthis.com/static/btn/sm-share-en.gif" width="83" height="16" alt="Bookmark and Share" style="border:0"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=addthiseere"></script>
+        <!-- AddThis Button END -->
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,69 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+?>
+<h1><?php echo $this->translator->_('Steam Calculators'); ?>
+    <span style='position: relative; top: -3px; left: 4px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="tutorials?vid=intro"><?php echo $this->translator->_("watch tutorial");?></a></span>
+    <span style='position: relative; top: -3px; left: 2px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="SSMTGuide.pdf"><?php echo $this->translator->_("view guide");?></a></span>
+</h1>
+
+<p><?php echo $this->translator->_('The Steam Calculators include property and equipment calculators as well as a basic steam system modeler.');?></p>
+<ul>
+    <li><a href="#Properties">2 <?php echo $this->translator->_('Steam Property Calculators'); ?></a></li>
+    <li><a href="#Equipment">7 <?php echo $this->translator->_('Steam Equipment Calculators'); ?></a></li>
+    <li><a href="#Modeler"><?php echo $this->translator->_('System Steam Modeler'); ?></a></li>
+</ul>
+<p><?php echo $this->translator->_('Units may be customized and a few alternate language options are available in'); ?> <a href="preferences"><?php echo $this->translator->_('Preferences'); ?></a>.</p>
+
+<?php 
+$descriptions = Steam_Support::descriptions();
+$majorCats = array(
+    'Properties' => 'Properties Calculators',
+    'Equipment' => 'Equipment Calculators',
+    'Modeler' => 'Steam System Modeler',
+);
+$vidLinks = array(
+    'Properties' => 'steam',
+    'Equipment' => 'layout',
+    'Modeler' => 'overview',   
+);
+$guidePage = array(
+    'Properties' => 13,
+    'Equipment' => 18,
+    'Modeler' => 49,   
+);
+foreach($majorCats as $cat => $catTitle){ ?>
+
+<h2 id="<?php echo $cat; ?>"><?php echo $this->translator->_($catTitle); ?>
+        <span style='position: relative; top: -3px; left: 4px; font-size: .65em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+        ><a href="tutorials?vid=<?php echo $vidLinks[$cat];?>"><?php echo $this->translator->_("watch tutorial");?></a></span>
+        <span style='position: relative; top: -3px; left: 4px; font-size: .65em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+        ><a href="SSMTGuide.pdf#page=<?php echo $guidePage[$cat];?>"><?php echo $this->translator->_("view guide");?></a></span>
+    </h2>
+
+<div style="margin-left: 15px;">
+    <?php 
+    echo "<table>";
+    foreach($descriptions[$cat] as $key => $description){  
+        echo "<tr>";        
+        echo "<td style='vertical-align: middle;'><a style='font-weight: bold;' href='{$description[2]}'><img style='border: 1px solid black;' src='images/icons/{$key}.gif' alt='{$description[0]}'></a></td>";
+        echo "<td style='padding-left: 10px;'>";
+        echo "<dl><dt><a style='font-weight: bold;' href='{$description[2]}'>".$this->translator->_($description[0])."</a></dt>";
+        echo "<dd>".$this->translator->_($description[1])."</dd></dl>";
+        echo "</td>";
+        echo "</tr>";
+    }
+    echo "</table>";
+    ?>
+</div><BR>
+
+<?php }

@@ -1,0 +1,293 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Equipment Calculators
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$titles = Steam_Support::descriptions('Equipment', 'deaerator');
+$linkLocation = 'equipDeaerator';
+?>
+<h1><?php echo $this->translator->_($titles[0]." Calculator");?>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="tutorials?vid=deaerator"><?php echo $this->translator->_("watch tutorial");?></a></span>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="SSMTGuide.pdf#page=39"><?php echo $this->translator->_("view guide");?></a></span>
+</h1>
+<h3><?php echo $this->translator->_($titles[1]);?></h3><BR>
+
+<?php
+$mS = Steam_MeasurementSystem::getInstance();
+$deaeratorForm = new Steam_Forms_Deaerator();
+$formValid = false;
+//Load Saved Form Data
+$formData = new Zend_Session_Namespace('formData');
+
+//Populate, validate, or reset form
+if (isset($_GET['reset'])) unset($formData->deaerator);
+$examples = Steam_DataGenerator::examples('deaerator');
+if (isset($_GET['random']) and isset($examples[$_GET['random']])) $_POST = Steam_DataGenerator::deaerator($_GET['random']);
+if (!isset($_POST['Enter']) and isset($formData->deaerator)){
+    $_POST = $formData->deaerator->unload();
+    $_POST['Enter'] = 'Enter';
+}
+if (isset($_POST['Enter'])) {    
+    if ($formValid = $deaeratorForm->isValid($_POST)){        
+        $formData->deaerator = new Steam_DTO('deaerator', $deaeratorForm->getValues() );
+    }
+}
+?>
+ 
+<script type="text/javascript">
+    $(document).ready(function() {               
+        $('#examplesA').hide();                  
+        $('#examplesB').hide();            
+        $('#examplesHint').show();         
+        
+        $('#exampleTable').mouseover(function(){ $('#examplesA').show();$('#examplesB').show();$('#examplesHint').hide(); });
+        $('#exampleTable').mouseout(function(){ $('#examplesA').hide();$('#examplesB').hide(); $('#examplesHint').show();});
+         
+        <?php 
+        echo Steam_StdForm::hintDetails(array(
+                          'type' => 'critPressure',
+                          'fieldID' => "daPressure",
+                          'title' => "Deaerator Pressure",
+                          'text' => "The pressure of the deaerator (DA).<br>-<span style='font-style: italic;'>Commonly 0 to 30</span>",                        
+                      ));    
+        echo Steam_StdForm::hintDetails(array(
+                          'type' => 'massflow',
+                          'fieldID' => "feedwaterFlow",
+                          'title' => "Feedwater Mass Flow",
+                          'text' => "Required mass flow of feedwater.",                        
+                      ));   
+        echo Steam_StdForm::hintDetails(array(
+                          'type' => 'ventRate',
+                          'fieldID' => "ventRate",
+                          'title' => "Vent Rate",
+                          'text' => "Deaerator vent rate as a % of feedwater flow.<br>-<span style='font-style: italic;'>Commonly 0.1 to 0.2</span>",
+                      ));
+        echo $deaeratorForm->jqueryAdd(); ?>    
+    });
+</script>
+
+<div id="formWdiagram"style="position: relative; height: 410px;">
+    <div style="position: absolute; top: 0px; left: 0px;"> 
+        <form method="POST" action="<?php echo $linkLocation; ?>">
+            <table class='data'>
+                <tr>
+                    <th><?php echo $this->translator->_('Deaerator Pressure');?> *</th><td><?php echo $deaeratorForm->daPressure->renderViewhelper()." ".$mS->label('pressure');?></td>
+                        <?php if ($errors = $deaeratorForm->daPressure->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr>
+                    <th><?php echo $this->translator->_('Vent Rate');?> *</th><td><?php echo $deaeratorForm->ventRate->renderViewhelper()." ".$mS->label('%');?></td>
+                        <?php if ($errors = $deaeratorForm->ventRate->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr>
+                    <th><?php echo $this->translator->_('Feedwater Mass Flow');?> *</th><td><?php echo $deaeratorForm->feedwaterFlow->renderViewhelper()." ".$mS->label('massflow');?></td>
+                        <?php if ($errors = $deaeratorForm->feedwaterFlow->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr><td colspan="2" style="text-align:center;"><h3><?php echo $this->translator->_('Water');?></h3></td></tr>
+                <?php echo $deaeratorForm->displaySteamFields('Water'); ?>
+                <tr><td colspan="2" style="text-align:center;"><h3><?php echo $this->translator->_('Steam');?></h3></td></tr>
+                <?php echo $deaeratorForm->displaySteamFields('Steam'); ?>
+                <tr><td><span style="font-style:italic; color: grey;">* <?php echo $this->translator->_('Required');?></span></td><td style="text-align: center;"><?php echo $deaeratorForm->Enter->renderViewhelper();?>
+                    <?php if ($formValid) echo "<span style='font-size: 1em; margin-left: 10px;'>[<a href=\"{$linkLocation}?reset=1\">{$this->translator->_('reset')}</a>]</span>";?></td></tr>
+            </table>
+        </form>
+        <?php echo $this->partial('/index/partials/dataFieldHint.phtml'); ?>
+        <?php 
+        if (isset($_GET['random']) and isset($examples[$_GET['random']])) 
+            echo "<span style='font-style: italic; color: darkblue;'>**".$this->translate("Example").": ".$this->translate($examples[$_GET['random']])."</span><BR><BR>"; ?>    
+        <table class="data" id='exampleTable' style="position: relative; z-index: 100;">
+            <tr>
+                <th rowspan="2" style="vertical-align: middle;"><?php echo $this->translate('Examples'); ?>:</th>
+                <td id="examplesHint" style="color: grey; font-style: italic;"><?php echo $this->translate('Mouse Over'); ?></td>
+            </tr><tr id='examplesA' style="background-color: white; z-index: 30;">
+                <?php foreach($examples as $key => $label): ?>
+                <td><a href="<?php echo $linkLocation;?>?random=<?php echo $key;?>"><?php echo $this->translate($label);?></a></td>
+                <?php endforeach;?>
+            </tr>
+        </table>
+        <div style="width: 280px">
+            <h3 style><?php echo $this->translator->_('Calculation Details and Assumptions below');?></h3>
+        </div>
+    </div>
+
+    
+
+<?php
+
+if ($formValid){
+    $waterObject = $deaeratorForm->getSteamObject('Water');
+    $steamObject = $deaeratorForm->getSteamObject('Steam');
+    
+    
+    $deaeratorObject = new Steam_Equipment_Deaerator(array(
+            'ventRate' => $_POST['ventRate']/100,
+            'daPressure' => $mS->standardize($_POST['daPressure'],'pressure'),
+            'daWaterFeed' => $waterObject,
+            'daSteamFeed' => $steamObject,
+            'feedwaterFlow' => $mS->standardize($_POST['feedwaterFlow'],'massflow'),
+                ));
+
+   // echo $deaeratorObject->displayDA();
+    
+?>
+
+    <div style="float: right; position: relative; height: 700px; width: 470px; margin-right: 20px; z-index: 0;">
+            <?php echo Steam_Support::displayWarnings($deaeratorObject);?>    
+        <div style="position: relative;">
+    <div style="position: absolute; left: 0px; top: 0px; z-index: 10; height: 100px;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $deaeratorObject->feedwater, 'steamName' => 'Feedwater'));?>
+    </div>  
+    
+    <div style="position: absolute; left: 100px; top: 130px; z-index: 10; height: 100px;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $deaeratorObject->daVentSteam, 'steamName' => 'Vented Steam'));?>
+    </div>  
+    
+    
+    <?php
+$tmp = new Steam_Model_Renderer();
+echo $tmp->drawPipe( 80, 33, 315, 181, 'vh','Purple');
+
+echo $tmp->drawSteamPoint(125, 33, 'Up.Right', 'Fine');
+echo $tmp->drawSteamPoint(315, 110, 'Left.Top', 'Fine');
+echo $tmp->drawPipe( 235, 181, 305, 181, 'vh','Brown');
+echo $tmp->drawPipe( 305, 181, 370, 181, 'vh','Blue');
+echo $tmp->drawSteamPoint(256, 181, 'Up.Right', 'Fine');
+echo $tmp->drawSteamPoint(350, 181, 'Up.Right', 'Fine');
+echo $tmp->drawPipe( 500, 430, 315, 181, 'hv','Red');
+echo $tmp->drawSteamPoint(315, 250, 'Left.Bottom', 'Fine');
+echo $tmp->drawSteamPoint(470, 430, 'Up.Right', 'Fine');
+?>
+    
+    <img id="equipment1" src="images/equipment/Da.gif" style="position: absolute; top:255px; left: 130px; width:100px; height:100px; z-index: 10;" alt="Deaerator">
+    <div style="position: absolute; top: 308px; left: 145px; color: #0000FF; font-weight: bold; font-size: 1em; background-color: white; width: 100px;
+             opacity:1; filter:alpha(opacity=100); padding: 1px; width:68px; text-align: center; z-index: 20;"><?php echo $this->translator->_('Deaerator');?>
+            </div>
+    <div style="position: absolute; left: 0px; top: 370px; z-index: 10; height: 100px;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $deaeratorObject->daWaterFeed, 'steamName' => 'Inlet Water'));?>
+    </div>  
+    
+    <div style="position: absolute; left: 100px; top: 500px; z-index: 10; height: 100px;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $deaeratorObject->daSteamFeed, 'steamName' => 'Inlet Steam'));?>
+    </div>  
+    </div>  
+</div>
+
+<?php
+    
+    
+}?>
+
+</div>
+<br style='clear: both;'><BR>
+
+<h2><?php echo $this->translator->_('Calculation Details');?></h2>
+<h3><?php echo $this->translator->_('Step 1: Determine Inlet Water Properties');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Inlet Water Pressure '.
+    'and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality)');?>:</span>
+<?php if ($formValid){ 
+    $steamObject = $deaeratorObject->daWaterFeed; 
+    $secParaDets = Steam_StdForm::secondParameterDetails($deaeratorForm->getValue('WaterSecondParameter')); ?>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($steamObject->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_($secParaDets[0]);?></var> = <?php echo $mS->$secParaDets[2]($steamObject->$secParaDets[1]);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($steamObject, $deaeratorForm->getValue('WaterSecondParameter'));?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?></span></li>     
+</ul>    
+<?php }else{ echo "<BR>";}  ?>
+
+
+<h3><?php echo $this->translator->_('Step 2: Determine Inlet Steam Properties');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Inlet Steam Pressure '.
+    'and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality)');?>:</span>
+<?php if ($formValid){ 
+    $steamObject = $deaeratorObject->daSteamFeed; 
+    $secParaDets = Steam_StdForm::secondParameterDetails($deaeratorForm->getValue('SteamSecondParameter')); ?>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($steamObject->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_($secParaDets[0]);?></var> = <?php echo $mS->$secParaDets[2]($steamObject->$secParaDets[1]);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($steamObject, $deaeratorForm->getValue('SteamSecondParameter'));?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?></span></li>     
+</ul>    
+<?php }else{ echo "<BR>";}  ?>
+
+
+<h3><?php echo $this->translator->_('Step 3: Determine Feedwater and Vented Steam Properties');?></h3>
+<?php if ($formValid){ ?>
+<ul>
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($deaeratorObject->daPressure);?></span></li>
+    <li><a href="propSaturated?Pressure=<?php echo $mS->rawPressure($deaeratorObject->daPressure);?>">[<?php echo $this->translator->_('Saturated Properties Calculator');?>]</a> => <ul>
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Saturated Liquid: Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($deaeratorObject->feedwater->specificEnthalpy);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Saturated Gas: Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($deaeratorObject->daVentSteam->specificEnthalpy);?></span></li>
+        </ul></li>
+</ul>
+<?php }else{ echo "<BR>";}  ?>
+
+
+<h3><?php echo $this->translator->_('Step 4: Determine Feedwater and Vented Mass Flows and Total Outlet Energy Flows');?></h3>
+<ul>
+    <li><var><?php echo $this->translator->_('Vented Steam Mass Flow');?></var> = <var><?php echo $this->translator->_('Vent Rate');?></var> * <var><?php echo $this->translator->_('Feedwater Mass Flow');?></var>
+    <?php if ($formValid){ ?>
+        <br>[<span class="equationValues"><var><?php echo $this->translator->_('Vented Steam Mass Flow');?></var> = <?php echo $mS->displayMassflowLabeled($deaeratorObject->daVentSteam->massFlow);?> = <?php echo number_format($deaeratorObject->ventRate*100,1);?> * <?php echo $mS->displayMassflowLabeled($deaeratorObject->feedwater->massFlow);?></span>]
+    <?php } ?>
+    </li>    
+</ul>
+<ul>
+    <li><var><?php echo $this->translator->_('Total DA Mass Flow');?></var> = <var><?php echo $this->translator->_('Vented Steam Mass Flow');?></var> + <var><?php echo $this->translator->_('Feedwater Mass Flow');?></var>
+    <?php if ($formValid){ ?>
+        <br>[<span class="equationValues"><var><?php echo $this->translator->_('Total DA Mass Flow');?></var> = <?php echo $mS->displayMassflowLabeled($deaeratorObject->totalFlow);?> = <?php echo $mS->displayMassflowLabeled($deaeratorObject->daVentSteam->massFlow);?> + <?php echo $mS->displayMassflowLabeled($deaeratorObject->feedwater->massFlow);?></span>]
+    <?php } ?>
+    </li>    
+</ul>
+<ul>
+    <li><var><?php echo $this->translator->_('Total Outlet Energy Flow');?></var> = [<var><?php echo $this->translator->_('Feedwater Specific Enthalpy');?></var> * <var><?php echo $this->translator->_('Feedwater Mass Flow');?></var>] + [<var><?php echo $this->translator->_('Vented Steam Specific Enthalpy');?></var> * <var><?php echo $this->translator->_('Vented Steam Mass Flow');?></var>]
+    <?php if ($formValid){ ?>
+        <br>[<span class="equationValues"><var><?php echo $this->translator->_('Total Outlet Energy Flow');?></var> = <?php echo $mS->displayEnergyflowLabeled($deaeratorObject->daVentSteam->energyFlow + $deaeratorObject->feedwater->energyFlow);?> = 
+            <?php echo $mS->displaySpecificEnthalpyLabeled($deaeratorObject->feedwater->specificEnthalpy);?> * <?php echo $mS->displayMassflowLabeled($deaeratorObject->feedwater->massFlow);?> + 
+            <?php echo $mS->displaySpecificEnthalpyLabeled($deaeratorObject->daVentSteam->specificEnthalpy);?> * <?php echo $mS->displayMassflowLabeled($deaeratorObject->daVentSteam->massFlow);?>
+    </span>]<?php } ?>
+    </li>    
+</ul>
+
+
+<h3><?php echo $this->translator->_('Step 5: Determine Inlet Water and Steam Mass Flows');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('The inlet mass flows are determine based on an energy and mass flow balance');?>:</span>
+<?php if ($formValid and $deaeratorObject->daSteamFeed->specificEnthalpy==$deaeratorObject->daWaterFeed->specificEnthalpy) echo "<span style='color: red;' class='equationDescriptions'>Steam and Water Specific Enthalpy Equal. No Steam Flow.</span>"; ?>
+<ul>
+    <li><var><?php echo $this->translator->_('Minimum Inlet Energy Flow');?></var> = <var><?php echo $this->translator->_('Inlet Water Specific Enthalpy');?></var> * <var><?php echo $this->translator->_('Total DA Mass Flow');?></var>
+    <?php if ($formValid){ ?>
+        <br>[<span class="equationValues"><var><?php echo $this->translator->_('Minimum Inlet Energy Flow');?></var> = <?php echo $mS->displayEnergyflowLabeled($deaeratorObject->totalFlow*$deaeratorObject->daWaterFeed->specificEnthalpy/1000);?> = <?php echo $mS->displaySpecificEnthalpyLabeled($deaeratorObject->daWaterFeed->specificEnthalpy);?> * <?php echo $mS->displayMassflowLabeled($deaeratorObject->totalFlow);?></span>]
+    <?php } ?></li>
+    <li><var><?php echo $this->translator->_('Additional Energy Flow Needed');?></var> = <var><?php echo $this->translator->_('Total Outlet Energy Flow');?></var> - <var><?php echo $this->translator->_('Minimum Inlet Energy Flow');?></var>
+    <?php if ($formValid){ ?>
+        <br>[<span class="equationValues"><var><?php echo $this->translator->_('Additional Energy Flow Needed');?></var> = <?php echo $mS->displayEnergyflowLabeled($deaeratorObject->neededEnergyFlow);?> = <?php echo $mS->displayEnergyflowLabeled($deaeratorObject->daVentSteam->energyFlow + $deaeratorObject->feedwater->energyFlow);?> - <?php echo $mS->displayEnergyflowLabeled($deaeratorObject->totalFlow*$deaeratorObject->daWaterFeed->specificEnthalpy/1000);?></span>]
+    <?php } ?></li>
+    <li><var><?php echo $this->translator->_('Inlet Steam Mass Flow');?></var> = <var><?php echo $this->translator->_('Additional Energy Flow Needed');?></var> / ( <var><?php echo $this->translator->_('Inlet Steam Specific Enthalpy');?></var> - <var><?php echo $this->translator->_('Inlet Water Specific Enthalpy');?></var> )
+    <?php if ($formValid){ ?>
+        <br>[<span class="equationValues"><var><?php echo $this->translator->_('Inlet Steam Mass Flow');?></var> = <?php echo $mS->displayMassflowLabeled($deaeratorObject->daSteamFeed->massFlow);?> = <?php echo $mS->displayEnergyflowLabeled($deaeratorObject->neededEnergyFlow);?> / ( <?php echo $mS->displaySpecificEnthalpyLabeled($deaeratorObject->daSteamFeed->specificEnthalpy);?> - <?php echo $mS->displaySpecificEnthalpyLabeled($deaeratorObject->daWaterFeed->specificEnthalpy);?> )</span>]
+    <?php } ?></li>
+    <li><var><?php echo $this->translator->_('Inlet Water Mass Flow');?></var> = <var><?php echo $this->translator->_('Total DA Mass Flow');?></var> - <var><?php echo $this->translator->_('Inlet Water Mass Flow');?></var>
+    <?php if ($formValid){ ?>
+        <br>[<span class="equationValues"><var><?php echo $this->translator->_('Inlet Water Mass Flow');?></var> = <?php echo $mS->displayMassflowLabeled($deaeratorObject->daWaterFeed->massFlow);?> = <?php echo $mS->displayMassflowLabeled($deaeratorObject->totalFlow);?> - <?php echo $mS->displayMassflowLabeled($deaeratorObject->daSteamFeed->massFlow);?> )</span>]
+    <?php } ?></li>
+</ul>
+
+<h2><?php echo $this->translator->_('Assumptions');?></h2>
+<ul>
+    <li><?php echo $this->translator->_('The Deaerator (DA) Vent Rate is a percent of feedwater flow.');?></li>
+    <li><?php echo $this->translator->_('The feedwater leaves the DA as a saturated liquid at DA pressure.');?></li>
+    <li><?php echo $this->translator->_('The DA vented gases are assumed to be saturated gas at DA pressure.');?></li>
+    <li><?php echo $this->translator->_('The DA has no additional heat or masses losses.');?></li>
+</ul>
+

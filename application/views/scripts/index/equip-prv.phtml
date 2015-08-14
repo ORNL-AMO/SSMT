@@ -1,0 +1,329 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Equipment Calculators
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$titles = Steam_Support::descriptions('Equipment', 'prv');
+$linkLocation = 'equipPrv';
+?>
+<h1><?php echo $this->translator->_($titles[0]." Calculator");?>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="tutorials?vid=prv"><?php echo $this->translator->_("watch tutorial");?></a></span>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="SSMTGuide.pdf#page=31"><?php echo $this->translator->_("view guide");?></a></span>
+</h1>
+<h3><?php echo $this->translator->_($titles[1]);?></h3><BR>
+
+<?php
+$mS = Steam_MeasurementSystem::getInstance();
+$prvForm = new Steam_Forms_PRV();
+$formValid = false;
+//Load Saved Form Data
+$formData = new Zend_Session_Namespace('formData');
+
+//Populate, validate, or reset form
+if (isset($_GET['reset'])) unset($formData->prv);
+$examples = Steam_DataGenerator::examples('prv');
+if (isset($_GET['random']) and isset($examples[$_GET['random']])) $_POST = Steam_DataGenerator::prv($_GET['random']);
+if (!isset($_POST['Enter']) and isset($formData->prv)){
+    $_POST = $formData->prv->unload();
+    $_POST['Enter'] = 'Enter';
+}
+if (isset($_POST['Enter'])){
+    if ($formValid = $prvForm->isValid($_POST)){
+        $formData->prv = new Steam_DTO('prv', $prvForm->getValues() );
+    }
+}
+?>
+
+<script type="text/javascript">
+    $(document).ready(function() {               
+        $('#examplesA').hide();                  
+        $('#examplesB').hide();            
+        $('#examplesHint').show();         
+        
+        $('#exampleTable').mouseover(function(){ $('#examplesA').show();$('#examplesB').show();$('#examplesHint').hide(); });
+        $('#exampleTable').mouseout(function(){ $('#examplesA').hide();$('#examplesB').hide(); $('#examplesHint').show();});       
+                  
+        desuperHighlight();
+        $('#desuperheating').change(function(){
+                desuperHighlight();
+        });
+        
+        function desuperHighlight(){            
+            if ($('#desuperheating').val()=="Yes"){
+                $('#formWdiagram').height('435');
+                $('#FeedwaterLabelRow').show();
+                $('#FeedwaterPressureRow').show();
+                $('#FeedwaterSecondRow').show();
+                $('#DesuperTempRow').show();
+            }else{
+                $('#formWdiagram').height('310');
+                $('#FeedwaterLabelRow').hide();
+                $('#FeedwaterPressureRow').hide();
+                $('#FeedwaterSecondRow').hide();
+                $('#DesuperTempRow').hide();
+            }
+        };
+                              
+        <?php echo Steam_StdForm::hintDetails(array(
+                          'type' => 'massflow',
+                          'fieldID' => "massFlow",
+                          'title' => "Inlet Mass Flow",                        
+                          'text' => "Mass flow of inlet steam.",                        
+                      )); 
+        echo  Steam_StdForm::hintDetails(array(
+                          'type' => 'maxPressure',
+                          'fieldID' => "outletPressure",
+                          'title' => "Outlet Pressure",
+                          'text' => "Outlet pressure of PRV.<BR><span style='font-style: italic; color: red;'>MUST also be lower than inlet pressure</span>",
+                      ));     
+        echo Steam_StdForm::hintDetails(array(
+                          'type' => 'temperature',
+                          'fieldID' => "desuperTemp",
+                          'title' => "Desuperheating Temperature",
+                          'text' => "The target temperature for desuperheating the outlet steam.<BR><span style='font-style: italic;'>-Must be below outlet temperature without desuperheating to have an affect.</apsn>",
+                      ));
+        echo $prvForm->jqueryAdd(); ?>             
+    });
+</script>
+
+<div id="formWdiagram"style="position: relative; height: 310px;">
+    <div style="position: absolute; top: 0px; left: 0px;"> 
+        <form method="POST" action="<?php echo $linkLocation; ?>">
+            <table class='data'>
+                <tr><td colspan="2" style="text-align:center;"><h3><?php echo $this->translator->_('Inlet');?></h3></td></tr>
+                <?php echo $prvForm->displaySteamFields('Inlet'); ?>
+                <tr>
+                    <th><?php echo $this->translator->_('Mass Flow');?> *</th><td><?php echo $prvForm->massFlow->renderViewhelper()." ".$mS->label('massflow');?></td>
+                        <?php if ($errors = $prvForm->massFlow->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr><td colspan="2"></td></tr>
+                <tr>
+                    <th><?php echo $this->translator->_('Outlet Pressure');?> *</th><td><?php echo $prvForm->outletPressure->renderViewhelper()." ".$mS->label('pressure');?></td>
+                        <?php if ($errors = $prvForm->outletPressure->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;"><h3><?php echo $prvForm->desuperheating->renderViewhelper();?></h3></td>
+                    <?php if ($errors = $prvForm->desuperheating->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr id="FeedwaterLabelRow"><td colspan="2" style="text-align:center;"><h3><?php echo $this->translator->_('Feedwater');?></h3></td></tr>
+                <?php echo $prvForm->displaySteamFields('Feedwater'); ?>
+                <tr><td colspan="2"></td></tr>
+                <tr id="DesuperTempRow">
+                    <th><?php echo $this->translator->_('Desuperheating Temperature');?> *</th><td><?php echo $prvForm->desuperTemp->renderViewhelper()." ".$mS->label('temperature');?></td>
+                        <?php if ($errors = $prvForm->desuperTemp->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <tr><td><span style="font-style:italic; color: grey;">* <?php echo $this->translator->_('Required');?></span></td><td style="text-align: center;"><?php echo $prvForm->Enter->renderViewhelper();?>
+                    <?php if ($formValid) echo "<span style='font-size: 1em; margin-left: 10px;'>[<a href=\"{$linkLocation}?reset=1\">{$this->translator->_('reset')}</a>]</span>";?></td></tr>
+            </table>
+        </form>
+        <?php echo $this->partial('/index/partials/dataFieldHint.phtml'); ?>
+        <?php 
+        if (isset($_GET['random']) and isset($examples[$_GET['random']])) 
+            echo "<span style='font-style: italic; color: darkblue;'>**".$this->translate("Example").": ".$this->translate($examples[$_GET['random']])."</span><BR><BR>"; ?>    
+        <table class="data" id='exampleTable' style="position: relative; z-index: 100;">
+            <tr>
+                <th rowspan="2" style="vertical-align: middle;"><?php echo $this->translate('Examples'); ?>:</th>
+                <td id="examplesHint" style="color: grey; font-style: italic;"><?php echo $this->translate('Mouse Over'); ?></td>
+            </tr><tr id='examplesA' style="background-color: white; z-index: 30;">
+                <?php foreach($examples as $key => $label): ?>
+                <td><a href="<?php echo $linkLocation;?>?random=<?php echo $key;?>"><?php echo $this->translate($label);?></a></td>
+                <?php endforeach;?>
+            </tr>
+        </table>
+        <div style="width: 280px">
+            <h3 style><?php echo $this->translator->_('Calculation Details and Assumptions below');?></h3>
+        </div>
+    </div>
+    <?php
+
+if ($formValid){    
+    $inletSteam = $prvForm->getSteamObject('Inlet');
+    $inletSteam->setMassFlow($mS->standardize($_POST['massFlow'],'massflow'));
+    if ($_POST['desuperheating']=='Yes'){
+        $prvObject = new Steam_Equipment_PRV($inletSteam, $mS->standardize($_POST['outletPressure'],'pressure'), $prvForm->getSteamObject('Feedwater'), $mS->standardize($_POST['desuperTemp'],'temperature'));
+        $diagramHeight = 490;
+    }else{
+        $prvObject = new Steam_Equipment_PRV($inletSteam, $mS->standardize($_POST['outletPressure'],'pressure'));
+        $diagramHeight = 350;
+    }
+?>
+    
+    <div style="float: right; position: relative; width: 470px; margin-right: 20px; z-index: 0;">
+            <?php echo Steam_Support::displayWarnings($prvObject);?>    
+    <div style="position: relative; height: <?php echo $diagramHeight;?>px;">
+        <?php $tmp = new Steam_Model_Renderer();?>
+
+        <div style="position: relative; left: 68px; z-index: 10;">  
+            <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+            'steamObject' => $prvObject->inletSteam, 'steamName' => 'Inlet'));?>
+        </div>
+
+        <?php 
+        echo $tmp->drawPipe( 140, 105, 80, 105, 'vh','Red'); 
+        echo $tmp->drawSteamPoint(125, 105, 'Down.Right', 'Fine');
+
+        echo $tmp->drawPipe( 180, 105, 230, 105, 'vh','Orange'); 
+        echo $tmp->drawSteamPoint(215, 105, 'Down.Right', 'Fine');
+
+        ?>   
+
+        <?php if ($_POST['desuperheating']=='Yes'){ 
+
+        echo $tmp->drawPipe( 170, 105, 370, 30, 'vh','Purple'); 
+        echo $tmp->drawSteamPoint(170, 80, 'Right.Top', 'Fine');
+        echo $tmp->drawSteamPoint(350, 30, 'Up.Left', 'Fine');
+            ?>
+        <div style="position: absolute; left: 0px; top: 370px; z-index: 10;">  
+            <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+            'steamObject' => $prvObject->desuperheatFluid, 'steamName' => 'Feedwater'));?>
+        </div>
+
+        <?php } ?>
+        <img src="images/equipment/Prv.gif" style="position: absolute; top:130px; left: 89px; width:30px; height:80px;">
+        <div style="position: absolute; left: 68px; top: 230px; z-index: 10;">  
+            <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+            'steamObject' => $prvObject->outletSteam, 'steamName' => 'Outlet'));?>
+        </div>
+        <div style="position: absolute; top:160px; left: 116px; ">  
+            <h2><?php echo $this->translator->_('PRV');?></h2>
+        </div>
+    </div>
+</div>
+
+<?php
+
+}?>
+</div> 
+<br style='clear: both;'>
+
+<h2><?php echo $this->translator->_('Calculation Details');?></h2>
+<h3><?php echo $this->translator->_('Step 1: Determine Inlet Steam Properties');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Inlet Pressure '.
+    'and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality)');?>:</span>
+<?php if ($formValid){ 
+    $steamObject = $prvObject->inletSteam; 
+    $secParaDets = Steam_StdForm::secondParameterDetails($prvForm->getValue('InletSecondParameter')); ?>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($steamObject->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_($secParaDets[0]);?></var> = <?php echo $mS->$secParaDets[2]($steamObject->$secParaDets[1]);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($steamObject, $prvForm->getValue('InletSecondParameter'));?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?></span></li>     
+</ul>    
+<?php }else{ echo "<BR>";}  ?>
+
+
+<h3><?php echo $this->translator->_("Step 2 'If NO Desuperheating': Determine Outlet Steam Properties");?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('A PRV is an isenthalpic process, meaning the inlet enthalpy is equal to the outlet enthalpy. '.
+    'The outlet properties are determined using the inlet enthalpy and outlet pressure');?>:</span>
+<?php if ($formValid and $prvForm->getValue('desuperheating')=='No'){ ?>
+<ul>
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($prvObject->outletSteam->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($prvObject->outletSteam->specificEnthalpy);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($prvObject->outletSteam, 'SpecificEnthalpy');?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Temperature');?></var> = <?php echo $mS->displayTemperatureLabeled($prvObject->outletSteam->temperature);?></span></li>
+</ul>
+<?php }else{ echo "<BR>";}  ?>
+
+<h3><?php echo $this->translator->_("Step 2 'If Desuperheating': Determine Cooling Water Properties");?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Inlet Pressure '.
+    'and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality)');?>:</span>
+<?php if ($formValid and $prvForm->getValue('desuperheating')=='Yes'){
+    $steamObject = $prvObject->desuperheatFluid; 
+    $secParaDets = Steam_StdForm::secondParameterDetails($prvForm->getValue('FeedwaterSecondParameter')); ?>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($steamObject->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_($secParaDets[0]);?></var> = <?php echo $mS->$secParaDets[2]($steamObject->$secParaDets[1]);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($steamObject, $prvForm->getValue('FeedwaterSecondParameter'));?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?></span></li>     
+</ul>    
+<?php }else{ echo "<BR>";}   ?>
+    
+    
+ 
+<h3><?php echo $this->translator->_('Step 3: Determine Desuperheated Outlet Steam Properties');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Outlet Pressure '.
+    'and Desuperheating Temperature');?>:</span>
+<?php if ($formValid and $prvForm->getValue('desuperheating')=='Yes'){ 
+    $steamObject = new Steam_Object(array(
+            'pressure' => $prvObject->outletSteam->pressure,
+            'temperature' => $prvObject->desuperheatTemp,
+            )); 
+    $secParaDets = Steam_StdForm::secondParameterDetails('Temperature'); ?>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($steamObject->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_($secParaDets[0]);?></var> = <?php echo $mS->$secParaDets[2]($steamObject->$secParaDets[1]);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($steamObject, $prvForm->getValue('InletSecondParameter'));?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?></span></li>     
+</ul>    
+<?php }else{ echo "<BR>";}   ?>
+
+
+<h3><?php echo $this->translator->_('Step 4: Determine Feedwater and Outlet Mass Flows');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('If the Desuperheated Outlet specific enthalpy is less than the Feedwater specific enthalpy or greater than the Inlet Steam specific enthalpy, '.
+    'the PRV outlet cannot be desuperheated to the set temperature and desuperheating is canceled.');?></span>
+<?php if ($formValid and $prvForm->getValue('desuperheating')=='Yes' and $prvObject->desuperheatFluid->specificEnthalpy>=$steamObject->specificEnthalpy) { ?>
+<br><span class="equationValues" style="color: red;"><?php echo $this->translator->_('Desuperheated Outlet specific enthalpy is less than the Feedwater specific enthalpy. Desuperheating canceled.');?></span><br>
+<?php }   ?>
+<?php if ($formValid and $prvForm->getValue('desuperheating')=='Yes' and $prvObject->inletSteam->specificEnthalpy<=$steamObject->specificEnthalpy) { ?>
+<br><span class="equationValues" style="color: red;"><?php echo $this->translator->_('Desuperheated Outlet specific enthalpy is greater than the Inlet Steam specific enthalpy. Desuperheating canceled.');?></span><br>
+<?php }   ?>
+<br>
+<span class="equationDescriptions"><?php echo $this->translator->_('Flows are determined using mass and energy balance equations');?>:</span>
+    <ol>   
+        <li><var><?php echo $this->translator->_('Mass Flow');?></var> = <var><?php echo $this->translator->_('MF');?></var></li>
+        <li><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <var><?php echo $this->translator->_('SE');?></var></li>
+        <li><var><?php echo $this->translator->_('Energy Flow');?></var> = <var><?php echo $this->translator->_('MF');?></var> * <var><?php echo $this->translator->_('SE');?></var></li>
+            
+            
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Outlet Steam MF');?></var> = <var><?php echo $this->translator->_('Inlet Steam MF');?></var> + <var><?php echo $this->translator->_('Feedwater MF');?></var></span></li>        
+        <li><span class="equationValues">[<var><?php echo $this->translator->_('Outlet Steam MF');?></var> * <var><?php echo $this->translator->_('Outlet Steam SE');?></var>]
+                = [<var><?php echo $this->translator->_('Inlet Steam MF');?></var> * <var><?php echo $this->translator->_('Inlet Steam SE');?></var>] 
+                + [<var><?php echo $this->translator->_('Feedwater MF');?></var> * <var><?php echo $this->translator->_('Feedwater SE');?></var>]</span></li>                
+        <li><span class="equationValues">[(<var><?php echo $this->translator->_('Inlet Steam MF');?></var> + <var><?php echo $this->translator->_('Feedwater MF');?></var>) * <var><?php echo $this->translator->_('Outlet Steam SE');?></var>]
+                = [<var><?php echo $this->translator->_('Inlet Steam MF');?></var> * <var><?php echo $this->translator->_('Inlet Steam SE');?></var>] 
+                + [<var><?php echo $this->translator->_('Feedwater MF');?></var> * <var><?php echo $this->translator->_('Feedwater SE');?></var>]</span></li>
+                
+        <li><span class="equationValues">[<var><?php echo $this->translator->_('Inlet Steam MF');?></var> * <var><?php echo $this->translator->_('Outlet Steam SE');?></var>] + [<var><?php echo $this->translator->_('Feedwater MF');?></var> * <var><?php echo $this->translator->_('Outlet Steam SE');?></var>]
+                = [<var><?php echo $this->translator->_('Inlet Steam MF');?></var> * <var><?php echo $this->translator->_('Inlet Steam SE');?></var>] 
+                + [<var><?php echo $this->translator->_('Feedwater MF');?></var> * <var><?php echo $this->translator->_('Feedwater SE');?></var>]</span></li>
+                
+        <li><span class="equationValues">[<var><?php echo $this->translator->_('Feedwater MF');?></var> * <var><?php echo $this->translator->_('Outlet Steam SE');?></var>] - [<var><?php echo $this->translator->_('Feedwater MF');?></var> * <var><?php echo $this->translator->_('Feedwater SE');?></var>]
+                = [<var><?php echo $this->translator->_('Inlet Steam MF');?></var> * <var><?php echo $this->translator->_('Inlet Steam SE');?></var>] - [<var><?php echo $this->translator->_('Inlet Steam MF');?></var> * <var><?php echo $this->translator->_('Outlet Steam SE');?></var>]</span></li>
+                                
+        <li><span class="equationValues">[<var><?php echo $this->translator->_('Feedwater MF');?></var> * (<var><?php echo $this->translator->_('Outlet Steam SE');?></var>] - <var><?php echo $this->translator->_('Feedwater SE');?></var>)]
+                = [<var><?php echo $this->translator->_('Inlet Steam MF');?></var> * (<var><?php echo $this->translator->_('Inlet Steam SE');?></var> - <var><?php echo $this->translator->_('Outlet Steam SE');?></var>)]</span></li>
+                
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Feedwater MF');?></var>
+                = <var><?php echo $this->translator->_('Inlet Steam MF');?></var> * (<var><?php echo $this->translator->_('Inlet Steam SE');?></var> - <var><?php echo $this->translator->_('Outlet Steam SE');?></var>)
+                / (<var><?php echo $this->translator->_('Outlet Steam SE');?></var> - <var><?php echo $this->translator->_('Feedwater SE');?></var>)</span>
+             
+            
+<?php if ($formValid and $prvForm->getValue('desuperheating')=='Yes' and $prvObject->inletSteam->specificEnthalpy>$steamObject->specificEnthalpy and $prvObject->desuperheatFluid->specificEnthalpy<$steamObject->specificEnthalpy) { ?>
+            <br>[<span class="equationValues"><var><?php echo $this->translator->_('Feedwater MF');?></var> = <?php echo $mS->displayMassflowLabeled($prvObject->desuperheatFluid->massFlow);?> = 
+                 <?php echo $mS->displayMassflowLabeled($prvObject->inletSteam->massFlow);?> * (<?php echo $mS->displaySpecificEnthalpyLabeled($prvObject->inletSteam->specificEnthalpy);?> -
+                 <?php echo $mS->displaySpecificEnthalpyLabeled($prvObject->outletSteam->specificEnthalpy);?>) / (<?php echo $mS->displaySpecificEnthalpyLabeled($prvObject->outletSteam->specificEnthalpy);?> 
+                - <?php echo $mS->displaySpecificEnthalpyLabeled($prvObject->desuperheatFluid->specificEnthalpy);?>)</span>]
+   <?php }?></li>
+        <li><span class="equationValues"><var><?php echo $this->translator->_('Outlet Steam MF');?></var> = <var><?php echo $this->translator->_('Inlet Steam MF');?></var> + <var><?php echo $this->translator->_('Feedwater MF');?></var></span>
+<?php if ($formValid and $prvForm->getValue('desuperheating')=='Yes' and $prvObject->inletSteam->specificEnthalpy>$steamObject->specificEnthalpy and $prvObject->desuperheatFluid->specificEnthalpy<$steamObject->specificEnthalpy) { ?>
+            <br>[<span class="equationValues"><var><?php echo $this->translator->_('Outlet Steam MF');?></var> = <?php echo $mS->displayMassflowLabeled($prvObject->outletSteam->massFlow);?> = 
+                 <?php echo $mS->displayMassflowLabeled($prvObject->inletSteam->massFlow);?> - <?php echo $mS->displayMassflowLabeled($prvObject->desuperheatFluid->massFlow);?></span>]
+            <?php }?></li>
+    </ol>
+
+
+<h2><?php echo $this->translator->_('Assumptions');?></h2>
+<ul>    
+    <li><?php echo $this->translator->_('The PRV (without desuperheating) is an isenthalpic process where inlet and outlet specific enthalpy is the same.');?></li>
+    <li><?php echo $this->translator->_('Feedwater is pumped into PRV at outlet pressure without a change in energy.');?></li>
+    
+</ul>

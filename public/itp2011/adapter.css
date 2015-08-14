@@ -1,0 +1,109 @@
+/* 
+    Document   : adapter
+    Created on : Mar 20, 2011, 4:07:27 PM
+    Author     : Mike
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+form.reg_display_form{
+	text-align: left;
+	border: 1px solid #000000;
+	font-size:80%;
+}
+.reg_display_form th {
+	font-weight: bold;
+	text-align: left;
+	background-color: #DDDDDD;
+		font-size:80%;
+	padding: 3px;
+}
+
+
+#ind_filter_switch {
+    border: 1px solid #bbbbff;
+    border-bottom: 0px;
+    background: #D4E5D5;
+    text-align: center;
+    vertical-align: bottom;
+    padding: 3px;
+    margin-top: 15px;
+    display: block;
+    float: right;
+    width: 100px;
+}
+#ind_filter {
+    border: 1px solid #bbbbff;
+    clear: both;
+    background: #eeeeff;
+	font-weight: bold;
+        color: #000066;
+        font-size:80%;
+}
+
+#codesearch dl,#codesearch  dd,#codesearch  dt{
+    margin: 0px;
+    padding: 0px;
+    display: inline;
+}
+#codesearch dl{
+    border: 1px solid #CCC;
+    background: #D4E5D5;
+    padding: 3px;
+    margin: 1px;
+    display: block;
+    float: left;
+    width: 290px;
+}
+
+table.case_study {
+    padding: 5px;
+}
+table.case_study td:first-child{
+    padding-right: 20px;
+}
+table.case_study td:first-child div{
+    border-top: 2px #C0C0C0 solid;
+    border-right: 2px #000066 solid;
+    border-left: 2px #C0C0C0 solid;
+    border-bottom: 2px #000066 solid;
+    padding: 0px;
+}
+
+#lectures2006 dt{
+    font-weight: bold;
+    padding: 5px;
+    font-size: .875em;
+    color: #000066;
+}
+#lectures2006 .errors{
+    font-weight: bold;
+    color: red;
+}
+
+
+#main_footer_links{
+    display: inline;
+}
+#main_footer_links li{
+    display: inline;
+}
+#main_footer_links a{
+    display: inline;
+    height: 70px;
+    padding: 0px 8px;
+}
+#main_footer_links img{
+    vertical-align: middle;
+}
+
+#container
+{
+    margin: 0px auto;
+    width: 1000px;
+}

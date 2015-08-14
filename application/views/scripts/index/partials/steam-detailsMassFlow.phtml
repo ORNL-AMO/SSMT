@@ -1,0 +1,40 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$mS = Steam_MeasurementSystem::getInstance(); 
+$this->translator = Zend_Registry::get('Zend_Translate');      
+
+if (!isset($this->steamName) ) $this->steamName='-';
+if (!isset($this->steamObject) ) $this->steamObject= new Steam_Object();
+?>
+<table class="data" style="width: 400px;">
+    <tr>            
+        <td colspan="2" style="background-color: #eeeeff"><h2 style="margin: 0px;"><?php echo $this->translator->_($this->steamName); ?></h2></td>
+        <th><?php echo $this->translator->_('Mass Flow');?></th><td <?php if ($this->steamObject->massFlow<=0) echo "style='color: red; font-weight: bold;'";?>><?php echo $mS->displayMassflowLabeled($this->steamObject->massFlow); ?></td>
+    </tr>
+    <tr>            
+        <th><?php echo $this->translator->_('Pressure');?></th><td><?php echo $mS->displayPressureLabeled($this->steamObject->pressure); ?></td>
+        <th><?php echo $this->translator->_('Sp. Enthalpy');?></th><td><?php echo $mS->displaySpecificEnthalpyLabeled($this->steamObject->specificEnthalpy); ?></td>
+    </tr>
+    <tr>
+        <th><?php echo $this->translator->_('Temperature');?></th><td><?php echo $mS->displayTemperatureLabeled($this->steamObject->temperature); ?></td>            
+        <th><?php echo $this->translator->_('Sp. Entropy');?></th><td><?php echo $mS->displaySpecificEntropyLabeled($this->steamObject->specificEntropy); ?></td>
+    </tr>  
+    <tr>
+        
+        <?php if ($this->steamObject->phase == 'Saturated') {
+            echo "<th>".$this->translator->_('Saturated')."</th><td style=''>".number_format($this->steamObject->quality,2)."</td>"; 
+        }else{?>
+        <th><?php echo $this->translator->_('Phase');?></th><td <?php if ($this->steamObject->phase<>'Gas') echo "style=''";?>><?php echo $this->translator->_($this->steamObject->phase); ?></td>
+        <?php } ?>
+        <th><?php echo $this->translator->_('Energy Flow');?></th><td><?php echo $mS->displayEnergyflowLabeled($this->steamObject->energyFlow); ?></td>
+    </tr>
+</table>

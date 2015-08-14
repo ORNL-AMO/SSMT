@@ -1,0 +1,268 @@
+<?php
+/**
+ * Steam Calculators
+ *
+ * @package    View_Scripts
+ * @subpackage Equipment Calculators
+ * @version    beta
+ * @author     Michael B Muller
+ * <mbm@analyticalenergy.com>
+ * 
+ */
+
+$titles = Steam_Support::descriptions('Equipment', 'header');
+$linkLocation = 'equipHeader';
+?>
+<h1><?php echo $this->translator->_($titles[0]." Calculator");?>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="tutorials?vid=header"><?php echo $this->translator->_("watch tutorial");?></a></span>
+    <span style='position: relative; top: -3px; left: 8px; font-size: .55em; border: 1px solid black; padding: 1px; padding-left: 3px; padding-right: 3px; background-color: #ddd;'
+    ><a href="SSMTGuide.pdf#page=35"><?php echo $this->translator->_("view guide");?></a></span>
+</h1>
+<h3><?php echo $this->translator->_($titles[1]);?></h3><BR>
+
+<?php
+$mS = Steam_MeasurementSystem::getInstance();
+$headerForm = new Steam_Forms_Header();  
+$formValid = false;
+//Load Saved Form Data
+$formData = new Zend_Session_Namespace('formData');
+
+//Populate, validate, or reset form
+if (isset($_GET['reset'])) unset($formData->header);
+$examples = Steam_DataGenerator::examples('header');
+if (isset($_GET['random']) and isset($examples[$_GET['random']])) $_POST = Steam_DataGenerator::header($_GET['random']);
+if ( !isset($_POST['Enter']) and isset($formData->header) ){
+    $_POST = $formData->header->unload();
+    $_POST['Enter'] = 'Enter';
+}
+if (isset($_POST['Enter'])){
+    if ($formValid = $headerForm->isValid($_POST) ){
+        $formData->header = new Steam_DTO('header', $headerForm->getValues() );      
+    }
+}
+?>
+
+<script type="text/javascript">
+    $(document).ready(function() {               
+        $('#examplesA').hide();             
+        $('#examplesHint').show();         
+        
+        $('#exampleTable').mouseover(function(){ $('#examplesA').show();$('#examplesHint').hide(); });
+        $('#exampleTable').mouseout(function(){ $('#examplesA').hide(); $('#examplesHint').show();});
+        
+        $('#fieldDetails').hide();  
+                    
+        showInlets();
+        $('#headerCount').change(function(){ 
+            showInlets();
+        });   
+        
+        function showInlets(){
+            for(i=2;i<=9;i++){
+                $('#Inlet'+i+'title').hide();
+                $('#Inlet'+i+'PressureRow').hide();
+                $('#Inlet'+i+'SecondRow').hide();
+                $('#massFlow'+i+'Row').hide();
+            }
+            for(i=2;i<=$('#headerCount').val();i++){
+                $('#Inlet'+i+'title').show();
+                $('#Inlet'+i+'PressureRow').show();
+                $('#Inlet'+i+'SecondRow').show();
+                $('#massFlow'+i+'Row').show();
+            }
+        }
+               
+        <?php 
+        echo Steam_StdForm::hintDetails(array(
+                          'type' => 'maxPressure',
+                          'fieldID' => "headerPressure",
+                          'title' => "Header Pressure",
+                          'text' => "The pressure of the header.",                     
+                      ));     
+
+        for($x=1;$x<=9;$x++){
+        echo Steam_StdForm::hintDetails(array(
+                          'type' => 'massflow',
+                          'fieldID' => "massFlow".$x,
+                          'title' => "Inlet {$x} Mass Flow",                        
+                          'text' => "Mass flow of steam (or liquid).",
+                      ));   
+        } 
+        echo $headerForm->jqueryAdd(); ?>       
+    });
+</script>
+
+<div style="position: relative;">
+    <div style="float: left;"> 
+        <form method="POST" action="<?php echo $linkLocation; ?>">
+            <table class="data">
+                <tr>
+                    <th><?php echo $this->translator->_('Number of Inlets');?></th>
+                    <td><?php echo $headerForm->headerCount->renderViewhelper();?></td>
+                </tr>
+            </table>
+            <table class='data'>
+                <tr id="headerPressureRow';?>">
+                    <th><?php echo $this->translator->_('Header Pressure');?> *</th><td><?php echo $headerForm->headerPressure->renderViewhelper()." ".$mS->label('pressure');?></td>
+                        <?php if ($errors = $headerForm->headerPressure->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <?php for($x=1;$x<=9;$x++){ 
+                echo "<tr id=\"Inlet{$x}title\"><td  colspan=\"2\" style=\"text-align:center;\"><h3>Inlet {$x}</h3></td></tr>";
+                echo $headerForm->displaySteamFields('Inlet'.$x);
+                $massFlowName = 'massFlow'.$x;
+                ?>
+                <tr id="<?php echo $massFlowName.'Row';?>">
+                    <th><?php echo $this->translator->_('Mass Flow');?> *</th><td><?php echo $headerForm->$massFlowName->renderViewhelper()." ".$mS->label('massflow');?></td>
+                        <?php if ($errors = $headerForm->$massFlowName->renderErrors()) echo "<td>{$errors}</td>"; ?>
+                </tr>
+                <?php } ?>
+                <tr><td><span style="font-style:italic; color: grey;">* <?php echo $this->translator->_('Required');?></span></td><td style="text-align: center;"><?php echo $headerForm->Enter->renderViewhelper();?>
+                    <?php if ($formValid) echo "<span style='font-size: 1em; margin-left: 10px;'>[<a href=\"{$linkLocation}?reset=1\">{$this->translator->_('reset')}</a>]</span>";?></td></tr>
+            </table>
+        </form>
+        <?php echo $this->partial('/index/partials/dataFieldHint.phtml'); ?>
+        <?php 
+        if (isset($_GET['random']) and isset($examples[$_GET['random']])) 
+            echo "<span style='font-style: italic; color: darkblue;'>**".$this->translate("Example").": ".$this->translate($examples[$_GET['random']])."</span><BR><BR>"; ?>    
+        <table class="data" id='exampleTable' style="position: relative; z-index: 100;">
+            <tr>
+                <th rowspan="2" style="vertical-align: middle;"><?php echo $this->translate('Examples'); ?>:</th>
+                <td id="examplesHint" style="color: grey; font-style: italic;"><?php echo $this->translate('Mouse Over'); ?></td>
+            </tr><tr id='examplesA' style="background-color: white; z-index: 30;">
+                <?php foreach($examples as $key => $label): ?>
+                <td><a href="<?php echo $linkLocation;?>?random=<?php echo $key;?>"><?php echo $this->translate($label);?></a></td>
+                <?php endforeach;?>
+            </tr>
+        </table>
+        <div style="width: 280px">
+            <h3 style><?php echo $this->translator->_('Calculation Details and Assumptions below');?></h3>
+        </div>      
+    </div>
+</div>
+
+<?php 
+if ($formValid){   
+    $headerCount = $headerForm->getValue('headerCount');
+    $inletStreams = array();
+    for($x=1;$x<=$headerCount;$x++){    
+        $steamObject = $headerForm->getSteamObject('Inlet'.$x);
+        $steamObject->setMassFlow($mS->standardize($headerForm->getValue('massFlow'.$x),'massflow'));
+        $inletStreams['Inlet'.$x] = $steamObject;
+    }
+    //$headerForm->getValue('headerPressure')
+    $headerObject = new Steam_Equipment_Header( $mS->standardize($headerForm->getValue('headerPressure'),'pressure'), $inletStreams );
+    ?>
+<div style="position: relative; float: left; margin-left: 40px; height: <?php echo $headerCount*140+100;?>px">
+    <?php
+    $steamObject = new Steam_Object();    
+    $tmp = new Steam_Model_Renderer();
+    
+echo $tmp->drawPipe( 43+$headerCount*140, 100, 80, 33, 'vh','Blue');
+echo $tmp->drawSteamPoint(125, 33, 'Up.Right', 'Fine');
+echo $tmp->drawSteamPoint(43+$headerCount*140, 80, 'Left.Bottom', 'Fine');
+
+for($x=1;$x<$headerCount;$x++){
+    echo $tmp->drawPipe( 43+$x*140, 100, 43+$x*140, 33, 'vh','Blue');
+    echo $tmp->drawSteamPoint(43+$x*140, 80, 'Left.Bottom', 'Fine');
+    echo $tmp->drawMultiJoint(43+$x*140, 33, 'Wt');
+    $steamObject = $headerForm->getSteamObject('Inlet'.$x);
+    $steamObject->setMassFlow($mS->standardize($headerForm->getValue('massFlow'.$x),'massflow'));
+    ?>
+    <div style="position: absolute; left: 100px; top: <?php echo $x*140;?>px; z-index: 10; height: 100px;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $steamObject, 'steamName' => 'Inlet '.$x));?>
+    </div>  
+    <?php
+}
+
+    
+    ?>
+    <div style="position: absolute; left: 0px; top: 0px; z-index: 10; height: 100px;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $headerObject->finalHeaderSteam, 'steamName' => 'Combined Header'));?>
+    </div>  
+    <?php
+    
+    $steamObject = $headerForm->getSteamObject('Inlet'.$headerCount);
+    $steamObject->setMassFlow($mS->standardize($headerForm->getValue('massFlow'.$headerCount),'massflow'));
+    ?>
+    <div style="position: absolute; left: 100px; top: <?php echo $headerCount*140;?>px; z-index: 10; height: 100px;">  
+        <?php echo $this->partial('/index/partials/steam-detailsMassFlow.phtml', array(
+        'steamObject' => $steamObject, 'steamName' => 'Inlet '.$headerCount));?>
+    </div>  
+</div>
+<?php } ?>
+<br style="clear: both;">
+
+<h2><?php echo $this->translator->_('Calculation Details');?></h2>
+<h3><?php echo $this->translator->_('Step 1: Determine the properties and energy flows for the inlets');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Inlet Pressure '.
+    'and the selected second parameter (Temperature, Specific Enthalpy, Specific Entropy, or Quality). The Specific Enthalpy is then multiplied by the Mass Flow to get the Energy Flow');?>:</span><br>
+<?php if ($formValid){ 
+    foreach($inletStreams as $key => $steamObject){
+    $secParaDets = Steam_StdForm::secondParameterDetails($headerForm->getValue($key.'SecondParameter')); ?>
+<span class="equationDescriptions"><?php echo $this->translator->_($key);?></span>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($steamObject->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_($secParaDets[0]);?></var> = <?php echo $mS->$secParaDets[2]($steamObject->$secParaDets[1]);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($steamObject, $headerForm->getValue($key.'SecondParameter'));?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?></span></li>     
+    <li><var><?php echo $this->translator->_('Inlet Energy Flow');?></var> = <var><?php echo $this->translator->_('Specific Enthalpy');?></var> * <var><?php echo $this->translator->_('Mass Flow');?></var>
+    
+        <br>[ <span class="equationValues"><var><?php echo $this->translator->_('Inlet Energy Flow');?></var> = <?php echo $mS->displayEnergyflowLabeled($steamObject->energyFlow);?> 
+        = <?php echo $mS->displaySpecificEnthalpyLabeled($steamObject->specificEnthalpy);?> * <?php echo $mS->displayMassflowLabeled($steamObject->massFlow);?></span> ]
+    </li>
+</ul>    
+<?php }} ?>
+
+
+<h3><?php echo $this->translator->_('Step 2: Determine the Header Specific Enthalpy');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('The header specific enthalpy can be calculated by dividing the Total Inlet Energy Flows by the Total Inlet Mass Flows');?>:</span>
+<?php if ($formValid){ ?>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Total Inlet Energy Flow');?></var> = <?php echo $mS->displayEnergyflowLabeled($headerObject->finalHeaderSteam->energyFlow);?> = 
+    <?php $cc = 0; foreach($inletStreams as $key => $steamObject){ ?>
+        <?php if ($cc++>0) echo "+";?>
+        <?php echo $mS->displayEnergyflowLabeled($steamObject->energyFlow);?>
+        <?php } ?></span> 
+    </li>
+</ul>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Total Inlet Mass Flow');?></var> = <?php echo $mS->displayMassflowLabeled($headerObject->finalHeaderSteam->massFlow);?> = 
+    <?php $cc = 0; foreach($inletStreams as $key => $steamObject){ ?>
+        <?php if ($cc++>0) echo "+";?>
+        <?php echo $mS->displayMassflowLabeled($steamObject->massFlow);?>
+        <?php } ?></span> 
+    </li>
+</ul>
+<ul>
+    <li><var><?php echo $this->translator->_('Header Specific Enthalpy');?></var> = <var><?php echo $this->translator->_('Total Energy Flow');?></var> / <var><?php echo $this->translator->_('Total Mass Flow');?></var>
+    
+        <br>[ <span class="equationValues"><var><?php echo $this->translator->_('Header Specific Enthalpy');?></var> = <?php echo $mS->displaySpecificEnthalpyLabeled($headerObject->finalHeaderSteam->specificEnthalpy);?> 
+        = <?php echo $mS->displayEnergyflowLabeled($headerObject->finalHeaderSteam->energyFlow);?> / <?php echo $mS->displayMassflowLabeled($headerObject->finalHeaderSteam->massFlow);?></span> ]
+    </li>
+</ul>    
+<?php }else{ echo "<br>"; } ?>
+
+<h3><?php echo $this->translator->_('Step 3: Determine Header Properties');?></h3>
+<span class="equationDescriptions"><?php echo $this->translator->_('Using the Steam Property Calculator, properties are determined using Header Pressure '.
+    'and the Header Specific Enthalpy');?>:</span>
+<?php if ($formValid){ 
+    $steamObject = $headerObject->finalHeaderSteam; 
+    $secParaDets = Steam_StdForm::secondParameterDetails('SpecificEnthalpy'); ?>
+<ul> 
+    <li><span class="equationValues"><var><?php echo $this->translator->_('Pressure');?></var> = <?php echo $mS->displayPressureLabeled($steamObject->pressure);?></span></li>
+    <li><span class="equationValues"><var><?php echo $this->translator->_($secParaDets[0]);?></var> = <?php echo $mS->$secParaDets[2]($steamObject->$secParaDets[1]);?></span></li>    
+    <li><a href="<?php echo Steam_StdForm::propLink($steamObject, 'SpecificEnthalpy');?>">[<?php echo $this->translator->_('Steam Property Calculator');?>]</a> => 
+    <span class="equationValues"><var><?php echo $this->translator->_('Temperature');?></var> = <?php echo $mS->displayTemperatureLabeled($steamObject->temperature);?></span></li>     
+</ul>    
+<?php } ?>
+
+
+<h2><?php echo $this->translator->_('Assumptions');?></h2>
+<ul>
+    <li><?php echo $this->translator->_('Inlet Mass Flows equal Outlet Mass Flow.');?></li>
+    <li><?php echo $this->translator->_('Inlet Energy Flows equal Outlet Energy Flow.');?></li>
+    <li><?php echo $this->translator->_('The combined inlet pressures are adjusted to match the header pressure without energy loss or gain.');?></li>  
+</ul>
