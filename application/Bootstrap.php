@@ -63,6 +63,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         
         $view->addHelperPath('../library/Steam/Helper', 'Steam_Helper');
 
+        $locale = new Zend_Locale('en_US');
+        Zend_Registry::set('Zend_Locale', $locale);
+
         $loader = Zend_Loader_Autoloader::getInstance();
         $loader->registerNamespace(array('Steam_', 'User_'));        
         

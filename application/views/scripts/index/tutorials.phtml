@@ -99,7 +99,7 @@ if (isset($_GET['vid']) and isset($vids[$_GET['vid']]))
     <h3 style="padding-top: 5px;">Now Playing:</h3> <h2><?php echo $vids[$selected][0]; ?> </h2>
 
     <iframe width="512" height="384" style="border: 2px solid #666; color: blue;" 
-            src="https://www.youtube.com/embed/<?= $vids[$selected][2]; ?>?autoplay=0&rel=0&vq=hd720" 
+            src="https://www.youtube.com/embed/<?php echo $vids[$selected][2]; ?>?autoplay=0&rel=0&vq=hd720"
             frameborder="0" allowfullscreen></iframe>
 
 </div>
