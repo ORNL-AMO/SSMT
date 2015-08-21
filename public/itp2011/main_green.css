@@ -227,11 +227,11 @@ a img {vertical-align: middle; border:none; padding-left:3px;}
 
 /************ PROGRAM HEADER  *******/
 
-#program_header { background-color:#090; background-image:url(../images/header_strip_green.gif); background-repeat:repeat-x; height:104px; position:relative; }
+#program_header { background-color:#090; background-image:url(images/header_strip_green.gif); background-repeat:repeat-x; height:104px; position:relative; }
 
 #program_header_subsite { background-color:#fff; height:115px; position:relative;  }
 
-#program_header_subsite_nonav { height:93px; position:relative; background-image:url(/itp2011/images/background_shim.gif); background-repeat:repeat-x; background-color:#fff; margin-bottom:6px;}
+#program_header_subsite_nonav { height:93px; position:relative; background-image:url(images/background_shim.gif); background-repeat:repeat-x; background-color:#fff; margin-bottom:6px;}
 
 #program_header_content, #program_header_content_nonav { width:1000px; margin:0 auto; }
 
